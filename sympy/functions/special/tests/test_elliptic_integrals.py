@@ -8,9 +8,12 @@ from sympy.functions.elementary.trigonometric import (sin, tan)
 from sympy.functions.special.gamma_functions import gamma
 from sympy.functions.special.hyper import (hyper, meijerg)
 from sympy.integrals.integrals import Integral
+from sympy.series.limits import limit
 from sympy.series.order import O
 from sympy.functions.special.elliptic_integrals import (elliptic_k as K,
     elliptic_f as F, elliptic_e as E, elliptic_pi as P)
+from sympy.core.function import PoleError
+from sympy.testing.pytest import raises
 from sympy.core.random import (test_derivative_numerically as td,
                                       random_complex_number as randcplx,
                                       verify_numerically as tn)
@@ -48,6 +51,11 @@ def test_K():
 
     assert K(z).series(z) == pi/2 + pi*z/8 + 9*pi*z**2/128 + \
         25*pi*z**3/512 + 1225*pi*z**4/32768 + 3969*pi*z**5/131072 + O(z**6)
+
+    # the hypergeometric series K is expanded through converges only inside
+    # |m| < 1, so at the m = 1 endpoint it used to come back as nan
+    raises(PoleError, lambda: K(1 - z).series(z, 0, 2))
+    assert limit(K(1 - z), z, 0, '+') is zoo
 
     assert K(m).rewrite(Integral).dummy_eq(
         Integral(1/sqrt(1 - m*sin(t)**2), (t, 0, pi/2)))
@@ -120,6 +128,13 @@ def test_E():
         5*pi*z**3/512 - 175*pi*z**4/32768 - 441*pi*z**5/131072 + O(z**6)
     assert E(4*z/(z+1)).series(z) == \
         pi/2 - pi*z/2 + pi*z**2/8 - 3*pi*z**3/8 - 15*pi*z**4/128 - 93*pi*z**5/128 + O(z**6)
+
+    # E is continuous at m = 1 with E(1) = 1, but the hypergeometric series it
+    # is expanded through does not converge there and yielded nan, which made
+    # the limit come out as zoo
+    assert E(1) == 1
+    assert limit(E(1 - z), z, 0, '+') == 1
+    raises(PoleError, lambda: E(1 - z).series(z, 0, 2))
 
     assert E(z, m).rewrite(Integral).dummy_eq(
         Integral(sqrt(1 - m*sin(t)**2), (t, 0, z)))

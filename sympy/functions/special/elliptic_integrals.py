@@ -81,6 +81,10 @@ class elliptic_k(DefinedFunction):
 
     def _eval_nseries(self, x, n, logx, cdir=0):
         from sympy.simplify import hyperexpand
+        # the hypergeometric series converges only inside |m| < 1, so at the
+        # m = 1 endpoint it says nothing and hyperexpand returns nan
+        if (self.args[0].limit(x, 0) - 1).is_zero:
+            return super()._eval_nseries(x, n=n, logx=logx)
         return hyperexpand(self.rewrite(hyper)._eval_nseries(x, n=n, logx=logx))
 
     def _eval_rewrite_as_hyper(self, m, **kwargs):
@@ -287,6 +291,10 @@ class elliptic_e(DefinedFunction):
     def _eval_nseries(self, x, n, logx, cdir=0):
         from sympy.simplify import hyperexpand
         if len(self.args) == 1:
+            # the hypergeometric series converges only inside |m| < 1, so at
+            # the m = 1 endpoint it says nothing and hyperexpand returns nan
+            if (self.args[0].limit(x, 0) - 1).is_zero:
+                return super()._eval_nseries(x, n=n, logx=logx)
             return hyperexpand(self.rewrite(hyper)._eval_nseries(x, n=n, logx=logx))
         return super()._eval_nseries(x, n=n, logx=logx)
 
