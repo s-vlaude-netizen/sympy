@@ -644,6 +644,18 @@ def test_lambertw():
     n = Symbol('n', negative=True)
     assert LambertW(n).is_zero is False
 
+    # the Maclaurin series of W only describes an argument that goes to zero;
+    # elsewhere W is analytic and the generic expansion applies. The series
+    # used to be taken about zero whatever the argument did, so LambertW(1 + x)
+    # came out as -x - x**2, tending to 0 rather than to LambertW(1).
+    assert LambertW(x).series(x, 0, 4) == x - x**2 + 3*x**3/2 + O(x**4)
+    for a in (1, 2, S.Half, Rational(-1, 4)):
+        ser = LambertW(a + x).series(x, 0, 3).removeO()
+        assert ser.subs(x, 0) == LambertW(a)
+        num = ser.subs(x, Rational(1, 1000)).evalf(25)
+        exact = LambertW(a + Rational(1, 1000)).evalf(25)
+        assert abs(num - exact) < Float('1e-6')
+
 
 def test_issue_5673():
     e = LambertW(-1)
