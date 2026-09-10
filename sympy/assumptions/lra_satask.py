@@ -33,7 +33,7 @@ def lra_satask(proposition, assumptions=True):
 # WHITE_LIST is a list of predicates that can always be handled.
 WHITE_LIST = ALLOWED_PRED.keys() | {Q.positive, Q.negative, Q.zero, Q.nonzero, Q.nonpositive, Q.nonnegative,
                                     Q.extended_positive, Q.extended_negative, Q.extended_nonpositive,
-                                    Q.extended_negative, Q.extended_nonzero, Q.negative_infinite,
+                                    Q.extended_nonnegative, Q.extended_nonzero, Q.negative_infinite,
                                     Q.positive_infinite}
 
 
@@ -201,7 +201,7 @@ pred_to_pos_neg_zero = {
     Q.extended_positive: Q.positive,
     Q.extended_negative: Q.negative,
     Q.extended_nonpositive: Q.nonpositive,
-    Q.extended_negative: Q.negative,
+    Q.extended_nonnegative: Q.nonnegative,
     Q.extended_nonzero: Q.nonzero,
     Q.negative_infinite: False,
     Q.positive_infinite: False
