@@ -610,8 +610,19 @@ def test_li():
                                       meijerg(((), (1,)), ((0, 0), ()), -log(z)))
 
     assert gruntz(1/li(z), z, oo) is S.Zero
-    assert li(z).series(z) == log(z)**5/600 + log(z)**4/96 + log(z)**3/18 + log(z)**2/4 + \
-            log(z) + log(log(z)) + EulerGamma
+    # li(z) tends to zero as z does, like z/log(z); the expansion of Ei about
+    # zero used to be applied here even though log(z) runs off to -oo, giving
+    # a divergent -- and complex -- answer for a real function that vanishes
+    assert li(z).series(z) == z*(120/log(z)**5 + 24/log(z)**4 + 6/log(z)**3 +
+        2/log(z)**2 + 1/log(z) + 1 + O(log(z)**(-6)))/log(z)
+    assert limit(li(z), z, 0, '+') == 0
+    # around z = 1 the Ei expansion does apply, and stays real on both sides
+    assert li(1 + z).series(z, 0, 2) == \
+        log(z + 1) + log(log(z + 1)) + EulerGamma
+    # below z = 1 the log of the argument is negative and li is still real, so
+    # the I*pi that log carries there has to come off again
+    assert li(1 - z).series(z, 0, 2) == \
+        log(1 - z) + log(log(1 - z)) + EulerGamma - I*pi
     raises(ArgumentIndexError, lambda: li(z).fdiff(2))
 
 
@@ -625,8 +636,8 @@ def test_Li():
 
     assert gruntz(1/Li(z), z, oo) is S.Zero
     assert Li(z).rewrite(li) == li(z) - li(2)
-    assert Li(z).series(z) == \
-        log(z)**5/600 + log(z)**4/96 + log(z)**3/18 + log(z)**2/4 + log(z) + log(log(z)) - li(2) + EulerGamma
+    assert Li(z).series(z) == z*(120/log(z)**5 + 24/log(z)**4 + 6/log(z)**3 +
+        2/log(z)**2 + 1/log(z) + 1 + O(log(z)**(-6)))/log(z) - li(2)
     raises(ArgumentIndexError, lambda: Li(z).fdiff(2))
 
 

@@ -1666,8 +1666,22 @@ class li(DefinedFunction):
 
     def _eval_nseries(self, x, n, logx, cdir=0):
         z = self.args[0]
-        s = [(log(z))**k / (factorial(k) * k) for k in range(1, n)]
-        return EulerGamma + log(log(z)) + Add(*s)
+        # This is the expansion of Ei(w) about w = 0 with w = log(z), so it
+        # describes li only where log(z) tends to zero, that is around z = 1.
+        # Used around z = 0, where log(z) runs off to -oo, it returns a
+        # divergent expression for a function that tends to zero.
+        if z.limit(x, 0) is not S.One:
+            return self.rewrite(Ei)._eval_nseries(x, n, logx, cdir)
+        w = log(z)
+        s = [w**k / (factorial(k) * k) for k in range(1, n)]
+        res = EulerGamma + log(w) + Add(*s)
+        # Ei(w) is EulerGamma + log(w) only up to an I*pi that has to come off
+        # again once w reaches zero from the negative side, that is from below
+        # z = 1, where li is still real
+        ndir = w.as_leading_term(x, cdir=cdir).dir(x, cdir if cdir != 0 else 1)
+        if re(ndir).is_negative:
+            res -= I*pi
+        return res
 
     def _eval_is_zero(self):
         z = self.args[0]
