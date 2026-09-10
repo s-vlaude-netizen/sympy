@@ -438,6 +438,17 @@ def test_ei():
 
     assert gruntz(Ei(x+exp(-x))*exp(-x)*x, x, oo) == 1
 
+    # Ei is real on the negative real axis, so a leading term taken with an
+    # unspecified cdir must not pick up the I*pi of log(-1); the direction used
+    # to collapse to 0 there, leaving the correction unapplied
+    w = Dummy('w', positive=True)
+    assert Ei(-w).as_leading_term(w) == log(w) + EulerGamma
+    assert Ei(w).as_leading_term(w) == log(w) + EulerGamma
+    assert limit(Ei(-exp(-x)) + x, x, oo) == EulerGamma
+    assert limit(Ei(exp(-x)) + x, x, oo) == EulerGamma
+    # the mean of a Gumbel distribution, which goes through that limit
+    assert integrate(x*exp(-x - exp(-x)), (x, -oo, oo)) == EulerGamma
+
     assert Ei(x).series(x) == EulerGamma + log(x) + x + x**2/4 + \
         x**3/18 + x**4/96 + x**5/600 + O(x**6)
     assert Ei(x).series(x, 1, 3) == Ei(1) + E*(x - 1) + O((x - 1)**3, (x, 1))

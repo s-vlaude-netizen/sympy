@@ -1248,7 +1248,9 @@ class Ei(DefinedFunction):
         from sympy import re
         x0 = self.args[0].limit(x, 0)
         arg = self.args[0].as_leading_term(x, cdir=cdir)
-        cdir = arg.dir(x, cdir)
+        # dir() returns coeff*cdir**minexp, so an unspecified cdir of 0 would
+        # collapse to 0 and hide which side of the branch cut we approach from
+        cdir = arg.dir(x, cdir if cdir != 0 else 1)
         if x0.is_zero:
             c, e = arg.as_coeff_exponent(x)
             logx = log(x) if logx is None else logx
