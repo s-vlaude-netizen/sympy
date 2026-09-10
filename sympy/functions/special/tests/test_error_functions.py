@@ -449,6 +449,17 @@ def test_ei():
     # the mean of a Gumbel distribution, which goes through that limit
     assert integrate(x*exp(-x - exp(-x)), (x, -oo, oo)) == EulerGamma
 
+    # Ei(x**2) - log(x**2) is even in x, so both one sided limits agree; the
+    # expansion used to be assembled as log(c) + e*log(x), which drops the
+    # -2*I*pi that log(x**2) carries when x is negative
+    for f in (Ei, Ci, Chi):
+        assert limit(f(x**2) - log(x**2), x, 0, '+') == EulerGamma
+        assert limit(f(x**2) - log(x**2), x, 0, '-') == EulerGamma
+    assert Ei(x**2).as_leading_term(x, cdir=-1) == 2*log(x) - 2*I*pi + EulerGamma
+    assert Ei(x**2).as_leading_term(x, cdir=1) == 2*log(x) + EulerGamma
+    assert Ci(x**2).as_leading_term(x, cdir=-1) == 2*log(x) - 2*I*pi + EulerGamma
+    assert Ci(x**2).as_leading_term(x, cdir=1) == 2*log(x) + EulerGamma
+
     assert Ei(x).series(x) == EulerGamma + log(x) + x + x**2/4 + \
         x**3/18 + x**4/96 + x**5/600 + O(x**6)
     assert Ei(x).series(x, 1, 3) == Ei(1) + E*(x - 1) + O((x - 1)**3, (x, 1))

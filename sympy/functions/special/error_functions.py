@@ -1250,12 +1250,14 @@ class Ei(DefinedFunction):
         arg = self.args[0].as_leading_term(x, cdir=cdir)
         # dir() returns coeff*cdir**minexp, so an unspecified cdir of 0 would
         # collapse to 0 and hide which side of the branch cut we approach from
-        cdir = arg.dir(x, cdir if cdir != 0 else 1)
+        ndir = arg.dir(x, cdir if cdir != 0 else 1)
         if x0.is_zero:
-            c, e = arg.as_coeff_exponent(x)
-            logx = log(x) if logx is None else logx
-            return log(c) + e*logx + EulerGamma - (
-                I*pi if re(cdir).is_negative else S.Zero)
+            # Ei(z) ~ EulerGamma + log(z), with a further -I*pi when z reaches
+            # zero from the negative side. Let log() work out its own leading
+            # term: writing it by hand as log(c) + e*log(x) drops the branch
+            # correction that log carries for negative x.
+            return log(arg).as_leading_term(x, logx=logx, cdir=cdir) \
+                + EulerGamma - (I*pi if re(ndir).is_negative else S.Zero)
         return super()._eval_as_leading_term(x, logx=logx, cdir=cdir)
 
     def _eval_nseries(self, x, n, logx, cdir=0):
@@ -2081,9 +2083,11 @@ class Ci(TrigonometricIntegral):
         if arg0 is S.NaN:
             arg0 = arg.limit(x, 0, dir='-' if re(cdir).is_negative else '+')
         if arg0.is_zero:
-            c, e = arg.as_coeff_exponent(x)
-            logx = log(x) if logx is None else logx
-            return log(c) + e*logx + EulerGamma
+            # the expansion at zero is EulerGamma + log(z); let log() supply
+            # its own leading term so the branch correction it carries for
+            # negative x survives, as it does not when this is spelled out by
+            # hand as log(c) + e*log(x)
+            return log(arg).as_leading_term(x, logx=logx, cdir=cdir) + EulerGamma
         elif arg0.is_finite:
             return self.func(arg0)
         else:
@@ -2317,9 +2321,11 @@ class Chi(TrigonometricIntegral):
         if arg0 is S.NaN:
             arg0 = arg.limit(x, 0, dir='-' if re(cdir).is_negative else '+')
         if arg0.is_zero:
-            c, e = arg.as_coeff_exponent(x)
-            logx = log(x) if logx is None else logx
-            return log(c) + e*logx + EulerGamma
+            # the expansion at zero is EulerGamma + log(z); let log() supply
+            # its own leading term so the branch correction it carries for
+            # negative x survives, as it does not when this is spelled out by
+            # hand as log(c) + e*log(x)
+            return log(arg).as_leading_term(x, logx=logx, cdir=cdir) + EulerGamma
         elif arg0.is_finite:
             return self.func(arg0)
         else:
