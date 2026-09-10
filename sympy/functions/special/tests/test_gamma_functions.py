@@ -591,6 +591,21 @@ def test_loggamma():
         pi**4*x**4/360 + x**5*polygamma(4, 1)/120 + O(x**6)
     assert s1 == loggamma(x).rewrite('intractable').series(x).cancel()
 
+    # loggamma is the analytic continuation of log(gamma(z)) and differs from
+    # it by 2*I*pi once z reaches zero from the negative side; expanding
+    # through the rewrite used to hand back log(gamma(z))'s branch, so the
+    # series had +I*pi where loggamma itself evaluates to -I*pi
+    assert loggamma(-x).series(x, 0, 3) == \
+        -I*pi - log(x) + EulerGamma*x + pi**2*x**2/12 + O(x**3)
+    assert loggamma(-x**2).series(x, 0, 3) == \
+        -I*pi - 2*log(x) + EulerGamma*x**2 + O(x**3)
+    assert loggamma(x).series(x, 0, 3, dir='-') == \
+        -I*pi - log(-x) - EulerGamma*x + pi**2*x**2/12 + O(x**3)
+    for e, pt in ((loggamma(-x), Rational(1, 1000)),
+                  (loggamma(-x**2), Rational(1, 1000))):
+        num = e.series(x, 0, 3).removeO().subs(x, pt).evalf(25)
+        assert abs(num - e.subs(x, pt).evalf(25)) < Rational(1, 10**8)
+
     assert conjugate(loggamma(x)) == loggamma(conjugate(x))
     assert conjugate(loggamma(0)) is oo
     assert conjugate(loggamma(1)) == loggamma(conjugate(1))
