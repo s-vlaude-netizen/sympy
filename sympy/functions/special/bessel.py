@@ -365,10 +365,19 @@ class bessely(BesselBase):
         c, e = arg.as_coeff_exponent(x)
 
         if e.is_positive:
+            if nu.is_integer is False:
+                # The logarithmic form used below is the expansion for an
+                # integer order. For any other order bessely is a combination
+                # of besselj of order nu and -nu with no log term at all, and
+                # for a negative non-integer order the two forms do not even
+                # agree on which power of z dominates.
+                arg = (besselj(nu, z)*cos(pi*nu) - besselj(-nu, z))/sin(pi*nu)
+                return arg.as_leading_term(x, logx=logx, cdir=cdir)
             term_one = ((2/pi)*log(z/2)*besselj(nu, z))
             term_two = -(z/2)**(-nu)*factorial(nu - 1)/pi if (nu).is_positive else S.Zero
             term_three = -(z/2)**nu/(pi*factorial(nu))*(digamma(nu + 1) - S.EulerGamma)
-            arg = Add(*[term_one, term_two, term_three]).as_leading_term(x, logx=logx)
+            arg = Add(*[term_one, term_two, term_three]).as_leading_term(
+                x, logx=logx, cdir=cdir)
             return arg
         elif e.is_negative:
             cdir = 1 if cdir == 0 else cdir
@@ -708,7 +717,9 @@ class besselk(BesselBase):
             else:
                 raise NotImplementedError(f"Cannot proceed without knowing if {nu} is zero or not.")
 
-            return term.as_leading_term(x, logx=logx)
+            # cdir has to be handed on: the log above needs it to stay on the
+            # right side of its branch cut when x is negative
+            return term.as_leading_term(x, logx=logx, cdir=cdir)
         elif e.is_negative:
             # Equation 9.7.2 of Abramowitz and Stegun (10th ed, 1972).
             return sqrt(pi)*exp(-arg)/sqrt(2*arg)
