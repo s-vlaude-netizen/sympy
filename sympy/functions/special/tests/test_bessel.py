@@ -458,6 +458,33 @@ def test_yn():
               [0.185250342 + 0.01489557397*I])
 
 
+def test_spherical_bessel_negative_argument():
+    # jn, yn, hn1 and hn2 used to be evaluated through
+    # sqrt(pi/(2*z))*besselj(nu + 1/2, z) and its relatives. Both factors
+    # carry a branch cut along the negative real axis and the product comes
+    # out negated there, so the numbers disagreed with the closed forms the
+    # very same classes expand to.
+    z = symbols("z")
+    pts = [Rational(-3, 7), S(-2), Rational(-5, 2)]
+    for nu in range(4):
+        for p in pts:
+            assert abs(jn(nu, p).evalf(25)
+                       - expand_func(jn(nu, z)).subs(z, p).evalf(25)) < 1e-20
+            assert abs(yn(nu, p).evalf(25)
+                       - expand_func(yn(nu, z)).subs(z, p).evalf(25)) < 1e-20
+            # j_nu(-x) = (-1)**nu * j_nu(x)
+            assert abs(jn(nu, p).evalf(25)
+                       - S.NegativeOne**nu*jn(nu, -p).evalf(25)) < 1e-20
+            # and the Hankel forms must stay jn +- I*yn
+            assert abs(hn1(nu, p).evalf(25)
+                       - (jn(nu, p) + I*yn(nu, p)).evalf(25)) < 1e-20
+            assert abs(hn2(nu, p).evalf(25)
+                       - (jn(nu, p) - I*yn(nu, p)).evalf(25)) < 1e-20
+    # positive and complex arguments are unchanged
+    assert eq([jn(2, 5.2 + 0.3j).evalf(10)], [0.09941975672 - 0.05452508024*I])
+    assert eq([yn(2, 5.2 + 0.3j).evalf(10)], [0.185250342 + 0.01489557397*I])
+
+
 def test_sympify_yn():
     assert S(15) in myn(3, pi).atoms()
     assert myn(3, pi) == 15/pi**4 - 6/pi**2

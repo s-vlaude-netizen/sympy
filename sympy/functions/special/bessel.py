@@ -1034,7 +1034,11 @@ class jn(SphericalBesselBase):
 
     def _eval_evalf(self, prec):
         if self.order.is_Integer:
-            return self.rewrite(besselj)._eval_evalf(prec)
+            # sqrt(pi/(2*z))*besselj(nu + 1/2, z) only represents jn to the
+            # right of the branch cut that both of its factors carry; on the
+            # negative real axis it comes out negated. The closed form above
+            # is the definition and holds everywhere.
+            return self._expand()._eval_evalf(prec)
 
 
 class yn(SphericalBesselBase):
@@ -1100,7 +1104,9 @@ class yn(SphericalBesselBase):
 
     def _eval_evalf(self, prec):
         if self.order.is_Integer:
-            return self.rewrite(bessely)._eval_evalf(prec)
+            # as for jn: the bessely form is negated on the negative real
+            # axis, where the closed form above still holds
+            return self._expand()._eval_evalf(prec)
 
 
 class SphericalHankelBase(SphericalBesselBase):
@@ -1157,7 +1163,10 @@ class SphericalHankelBase(SphericalBesselBase):
 
     def _eval_evalf(self, prec):
         if self.order.is_Integer:
-            return self.rewrite(besselj)._eval_evalf(prec)
+            # as for jn and yn, the besselj form is negated on the negative
+            # real axis; the closed form above is jn + hks*I*yn, which is the
+            # definition and holds everywhere
+            return self._expand()._eval_evalf(prec)
 
 
 class hn1(SphericalHankelBase):
