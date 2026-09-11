@@ -642,7 +642,7 @@ class erfi(DefinedFunction):
         return sqrt(-z**2)/z*(uppergamma(S.Half, -z**2)/sqrt(pi) - S.One)
 
     def _eval_rewrite_as_expint(self, z, **kwargs):
-        return sqrt(-z**2)/z - z*expint(S.Half, -z**2)/sqrt(pi)
+        return -sqrt(-z**2)/z - z*expint(S.Half, -z**2)/sqrt(pi)
 
     def _eval_expand_func(self, **hints):
         return self.rewrite(erf)

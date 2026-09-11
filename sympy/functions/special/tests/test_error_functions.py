@@ -247,7 +247,14 @@ def test_erfi():
     assert erfi(z).rewrite('meijerg') == z*meijerg([S.Half], [], [0], [Rational(-1, 2)], -z**2)/sqrt(pi)
     assert erfi(z).rewrite('uppergamma') == (sqrt(-z**2)/z*(uppergamma(S.Half,
         -z**2)/sqrt(S.Pi) - S.One))
-    assert erfi(z).rewrite('expint') == sqrt(-z**2)/z - z*expint(S.Half, -z**2)/sqrt(S.Pi)
+    assert erfi(z).rewrite('expint') == -sqrt(-z**2)/z - z*expint(S.Half, -z**2)/sqrt(S.Pi)
+    # the sqrt(-z**2)/z term used to carry the wrong sign, putting the rewrite
+    # 2*I*sign(z) away from erfi at every real point
+    for _p in (Rational(3, 7), Rational(-5, 2), S.One, -S.One, 2*I,
+               Rational(1, 3) + I/2):
+        for _t in ('expint', 'uppergamma', 'erf', 'erfc', 'hyper', 'meijerg'):
+            assert abs(erfi(_p).evalf(30)
+                       - erfi(z).rewrite(_t).subs(z, _p).evalf(30)) < Float('1e-20')
     assert erfi(z).rewrite('tractable') == -I*(-_erfs(I*z)*exp(z**2) + 1)
     assert expand_func(erfi(I*z)) == I*erf(z)
 
