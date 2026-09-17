@@ -7,20 +7,20 @@ and [FORK.md](FORK.md) for how they were produced.
 | | |
 |---|---|
 | Upstream `master` | `6e5b7af0` (2026-09-17) |
-| This fork | `aa1ba250` (2026-09-17) |
+| This fork | `58684c3d` (2026-09-17) |
 | Upstream commits not yet merged here | 0 |
-| Fork commits on top of upstream | 30 |
+| Fork commits on top of upstream | 31 |
 
 ## Net difference in the source tree
 
 What you get by using this fork instead of upstream, as a diff:
 
 ```
- CHANGELOG-FORK.md                                  | 156 +++++++++++++++++++++
- CLAUDE.md                                          | 135 +++++++++++++++++-
- DIVERGENCE.md                                      |  99 +++++++++++++
+ CHANGELOG-FORK.md                                  | 158 +++++++++++++++++++++
+ CLAUDE.md                                          | 145 ++++++++++++++++++-
+ DIVERGENCE.md                                      | 100 +++++++++++++
  FORK.md                                            |  82 +++++++++++
- README.md                                          | 101 ++++++++++---
+ README.md                                          | 110 +++++++++++---
  sympy/assumptions/handlers/matrices.py             |  12 +-
  sympy/assumptions/lra_satask.py                    |   4 +-
  sympy/assumptions/refine.py                        |   4 +-
@@ -38,7 +38,7 @@ What you get by using this fork instead of upstream, as a diff:
  sympy/functions/special/gamma_functions.py         |  13 +-
  sympy/functions/special/tests/test_bessel.py       |  49 +++++++
  .../special/tests/test_elliptic_integrals.py       |  15 ++
- .../special/tests/test_error_functions.py          |  47 ++++++-
+ .../special/tests/test_error_functions.py          |  47 +++++-
  .../special/tests/test_gamma_functions.py          |  15 ++
  sympy/matrices/expressions/matmul.py               |   2 +-
  sympy/matrices/expressions/tests/test_matmul.py    |   6 +
@@ -46,14 +46,14 @@ What you get by using this fork instead of upstream, as a diff:
  sympy/physics/control/tests/test_lti.py            |  12 +-
  sympy/printing/latex.py                            |   2 +-
  sympy/printing/tests/test_latex.py                 |   3 +
- sympy/release.py                                   |   5 +-
+ sympy/release.py                                   |   8 +-
  sympy/solvers/ode/nonhomogeneous.py                |   8 +-
  sympy/solvers/ode/ode.py                           |  50 ++++---
- sympy/solvers/ode/tests/test_ode.py                |  78 ++++++++---
+ sympy/solvers/ode/tests/test_ode.py                |  78 +++++++---
  sympy/stats/crv_types.py                           |   2 +-
  sympy/stats/tests/test_continuous_rv.py            |  11 ++
  tools/fork_divergence.py                           | 138 ++++++++++++++++++
- 37 files changed, 1219 insertions(+), 113 deletions(-)
+ 37 files changed, 1244 insertions(+), 113 deletions(-)
 ```
 
 ## Fork commits
@@ -88,6 +88,7 @@ What you get by using this fork instead of upstream, as a diff:
 - `bd168134` docs: fold the changelog into one section and explain "Unreleased"
 - `e2fb6a61` Mark the fork in its version and document installing it
 - `58225666` docs: say how to update an installed fork, and what tags are not for
+- `58684c3d` docs: release by master, and stop the version claiming a stale tag
 
 ## Possibly adopted upstream since
 

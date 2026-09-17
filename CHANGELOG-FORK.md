@@ -27,10 +27,13 @@ every change made since forking.
     up. Formerly `refine(sign(x), Q.positive(x))` gave `sign(x)` unchanged,
     although `Q.positive(x)` implies `Q.real(x)`; it now gives `1`.
   * The LRA satisfiability solver now handles `Q.extended_nonnegative`, which
-    was missing from its predicate white list. Formerly
+    was missing from its predicate white list and from the table translating an
+    `extended_*` predicate to its plain counterpart. Formerly, for real `x` and
+    `y`,
     `ask(Q.ge(x + y, 0), Q.extended_nonnegative(x) & Q.extended_nonnegative(y))`
     gave `None` while the mirrored question about `Q.extended_nonpositive` gave
-    `True`. Both give `True` now.
+    `True`. Both give `True` now. (The LRA solver only accepts real symbols, so
+    with a bare `Symbol('x')` both questions still give `None`.)
   * `Q.unitary` and `Q.orthogonal` now have a handler for `Adjoint`, so
     `ask(Q.unitary(X.adjoint()), Q.unitary(X))` gives `True` instead of `None`.
 
