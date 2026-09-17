@@ -98,6 +98,11 @@ README; then commit, and hand the owner `git tag -a fork-<Y>.<M>.<D>` plus
 `git push origin master --follow-tags`. Set the version back to plain `+fork`
 in the next commit after the tagged one.
 
+When upstream bumps its own version, say `1.15.0.dev` to `1.16.0.dev`, that
+line in `sympy/release.py` conflicts with the fork's `+fork` suffix. Resolve it
+by taking upstream's new base and keeping the suffix: `1.16.0.dev+fork`. No tag
+is involved, and the string stays true on its own.
+
 Never move or delete a pushed tag: anyone who pinned it gets different code
 under the same name. Cut a new one instead.
 
