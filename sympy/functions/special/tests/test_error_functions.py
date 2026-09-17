@@ -248,13 +248,15 @@ def test_erfi():
     assert erfi(z).rewrite('uppergamma') == (sqrt(-z**2)/z*(uppergamma(S.Half,
         -z**2)/sqrt(S.Pi) - S.One))
     assert erfi(z).rewrite('expint') == -sqrt(-z**2)/z - z*expint(S.Half, -z**2)/sqrt(S.Pi)
-    # the sqrt(-z**2)/z term used to carry the wrong sign, putting the rewrite
-    # 2*I*sign(z) away from erfi at every real point
+    for zval in (Rational(3, 4), 2, -2, I, -2*I, 1 + I, -1 + I, -2 - I):
+        r = erfi(z).rewrite(expint).subs(z, zval)
+        assert abs(r.evalf(15) - erfi(zval).evalf(15)) < 1e-13
+    # the same agreement for every other rewrite target, either side of zero
     for _p in (Rational(3, 7), Rational(-5, 2), S.One, -S.One, 2*I,
                Rational(1, 3) + I/2):
-        for _t in ('expint', 'uppergamma', 'erf', 'erfc', 'hyper', 'meijerg'):
+        for _t in ('uppergamma', 'erf', 'erfc', 'hyper', 'meijerg'):
             assert abs(erfi(_p).evalf(30)
-                       - erfi(z).rewrite(_t).subs(z, _p).evalf(30)) < Float('1e-20')
+                       - erfi(z).rewrite(_t).subs(z, _p).evalf(30)) < Rational(1, 10**20)
     assert erfi(z).rewrite('tractable') == -I*(-_erfs(I*z)*exp(z**2) + 1)
     assert expand_func(erfi(I*z)) == I*erf(z)
 
@@ -607,10 +609,17 @@ def test_li():
                                  log(log(z))/2 + Ci(I*log(z)) + Shi(log(z)))
     assert li(z).rewrite(Ci) == (-log(I*log(z)) - log(1/log(z))/2 +
                                  log(log(z))/2 + Ci(I*log(z)) + Shi(log(z)))
-    assert li(z).rewrite(Shi) == (-log(1/log(z))/2 + log(log(z))/2 +
-                                  Chi(log(z)) - Shi(log(z)))
-    assert li(z).rewrite(Chi) == (-log(1/log(z))/2 + log(log(z))/2 +
-                                  Chi(log(z)) - Shi(log(z)))
+    assert li(z).rewrite(Shi) == (-log(1/log(z))/2 - log(log(z))/2 +
+                                  Chi(log(z)) + Shi(log(z)))
+    assert li(z).rewrite(Chi) == (-log(1/log(z))/2 - log(log(z))/2 +
+                                  Chi(log(z)) + Shi(log(z)))
+    # the rewrites must agree with li numerically for 0 < z < 1, z > 1
+    # and complex z in all quadrants
+    for zval in (Rational(1, 4), Rational(9, 8), 3, -2, 2*I, -2*I,
+                 1 + 2*I, -1 + I, -2 - 3*I):
+        for target in (Si, Ci, Shi, Chi):
+            r = li(z).rewrite(target).subs(z, zval)
+            assert abs(r.evalf(15) - li(zval).evalf(15)) < 1e-13
     assert li(z).rewrite(hyper) ==(log(z)*hyper((1, 1), (2, 2), log(z)) -
                                    log(1/log(z))/2 + log(log(z))/2 + EulerGamma)
     assert li(z).rewrite(meijerg) == (-log(1/log(z))/2 - log(-log(z)) + log(log(z))/2 -
@@ -646,6 +655,12 @@ def test_Li():
     assert Li(z).series(z) == z*(120/log(z)**5 + 24/log(z)**4 + 6/log(z)**3 +
         2/log(z)**2 + 1/log(z) + 1 + O(log(z)**(-6)))/log(z) - li(2)
     raises(ArgumentIndexError, lambda: Li(z).fdiff(2))
+
+
+def test_Li_evalf_cancellation():
+    result = Li(2 + Rational(1, 10**20)).evalf()
+    expected = Float('1.442695040888963407354721258549378e-20', 50)
+    assert abs(result - expected) < 1e-34
 
 
 def test_si():
@@ -1138,3 +1153,16 @@ def test_owent_evalf():
     # Symmetry should hold numerically too
     assert abs(owens_t(-1, 2).evalf() - owens_t(1, 2).evalf()) < 1E-10
     assert abs(owens_t(1, -2).evalf() + owens_t(1, 2).evalf()) < 1E-10
+
+
+def test_owent_evalf_cancellation():
+    h, a = -6, 2
+    expr = erf(sqrt(2)*h/2)/2 + S.Half - 2*owens_t(h, a)
+
+    # The default precision must be propagated into the numerical integral so
+    # that Add can recover the cancellation in this left-tail probability.
+    result = expr.evalf()
+    # Independent 100-digit mpmath quadrature gives this reference value.
+    expected = Float('7.1180791906932412294852794865326e-43', 50)
+    assert result.is_Float
+    assert abs(result - expected) < 1e-55
