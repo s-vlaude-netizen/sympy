@@ -138,6 +138,12 @@ def test_refine():
     assert refine(kC*C.T, Q.orthogonal(C)).doit() == k*Identity(n)
     assert refine(kC* kC.T, Q.orthogonal(C)).doit() == (k**2)*Identity(n)
 
+    # a unitary matrix cancels against its adjoint, not its conjugate
+    assert refine(C*C.adjoint(), Q.unitary(C)).doit() == Identity(n)
+    assert refine(C.adjoint()*C, Q.unitary(C)).doit() == Identity(n)
+    assert refine(C*C.adjoint()*D, Q.unitary(C)).doit() == D
+    assert refine(C*C.conjugate(), Q.unitary(C)).doit() == C*C.conjugate()
+
 def test_matmul_no_matrices():
     assert MatMul(1) == 1
     assert MatMul(n, m) == n*m

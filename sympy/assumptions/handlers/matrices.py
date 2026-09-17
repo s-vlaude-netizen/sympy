@@ -9,10 +9,10 @@ from sympy.assumptions import Q
 from sympy.assumptions.ask import _ask_recursive
 from sympy.assumptions.handlers import test_closed_group
 from sympy.matrices import MatrixBase
-from sympy.matrices.expressions import (BlockMatrix, BlockDiagMatrix, Determinant,
-    DiagMatrix, DiagonalMatrix, HadamardProduct, Identity, Inverse, MatAdd, MatMul,
-    MatPow, MatrixExpr, MatrixSlice, MatrixSymbol, OneMatrix, Trace, Transpose,
-    ZeroMatrix)
+from sympy.matrices.expressions import (Adjoint, BlockMatrix, BlockDiagMatrix,
+    Determinant, DiagMatrix, DiagonalMatrix, HadamardProduct, Identity, Inverse,
+    MatAdd, MatMul, MatPow, MatrixExpr, MatrixSlice, MatrixSymbol, OneMatrix,
+    Trace, Transpose, ZeroMatrix)
 from sympy.matrices.expressions.blockmatrix import reblock_2x2
 from sympy.matrices.expressions.factorizations import Factorization
 from sympy.matrices.expressions.fourier import DFT
@@ -252,7 +252,7 @@ def _(expr, assumptions):
 def _(expr, assumptions):
     return False
 
-@OrthogonalPredicate.register_many(Inverse, Transpose)
+@OrthogonalPredicate.register_many(Adjoint, Inverse, Transpose)
 def _(expr, assumptions):
     return _ask_recursive(Q.orthogonal(expr.arg), assumptions)
 
@@ -297,7 +297,7 @@ def _(expr, assumptions):
     if Q.unitary(expr) in conjuncts(assumptions):
         return True
 
-@UnitaryPredicate.register_many(Inverse, Transpose)
+@UnitaryPredicate.register_many(Adjoint, Inverse, Transpose)
 def _(expr, assumptions):
     return _ask_recursive(Q.unitary(expr.arg), assumptions)
 

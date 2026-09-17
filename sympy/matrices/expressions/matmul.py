@@ -517,7 +517,7 @@ def refine_MatMul(expr, assumptions):
     for arg in exprargs[1:]:
         if arg == last.T and ask(Q.orthogonal(arg), assumptions):
             last = Identity(arg.shape[0])
-        elif arg == last.conjugate() and ask(Q.unitary(arg), assumptions):
+        elif arg == last.adjoint() and ask(Q.unitary(arg), assumptions):
             last = Identity(arg.shape[0])
         else:
             newargs.append(last)
