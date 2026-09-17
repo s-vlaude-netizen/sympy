@@ -1,4 +1,20 @@
-# SymPy
+# SymPy (independent fork)
+
+> **This is a fork of SymPy, not SymPy itself.** It carries a set of
+> AI-generated bug fixes on top of upstream `master` that upstream has declined
+> under its AI-generated code policy. It is not affiliated with, endorsed by, or
+> supported by the SymPy project.
+>
+> Read **[FORK.md](FORK.md)** before using it — in particular the AI disclosure
+> and what review these changes have and have not had. The fixes themselves are
+> listed in [CHANGELOG-FORK.md](CHANGELOG-FORK.md).
+>
+> For upstream SymPy, which is the reference implementation and what you
+> probably want, go to <https://github.com/sympy/sympy>.
+>
+> The badges and links below are inherited from upstream and point at upstream
+> resources: the PyPI package, issue tracker, chat, and mailing list are theirs,
+> not this fork's. Do not take fork problems to them.
 
 [![pypi version](https://img.shields.io/pypi/v/sympy.svg)](https://pypi.python.org/pypi/sympy)
 [![Join the chat at https://gitter.im/sympy/sympy](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/sympy/sympy?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
