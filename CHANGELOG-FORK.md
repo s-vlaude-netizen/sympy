@@ -79,6 +79,13 @@ All of these are bug fixes: no API was added, removed, or renamed. See
     as does `refine(X.adjoint()*X, Q.unitary(X))`. The test was written against
     the elementwise conjugate, for which the identity does not hold.
 
+* printing
+  * Fixed the LaTeX of a `Feedback` whose numerator is a `Series` and whose
+    feedback path is an ordinary `TransferFunction`. A stray comma made the
+    second denominator term a tuple, so `latex(Feedback(Series(tf1, tf2), tf3))`
+    typeset that denominator as `\left( \frac{1}{1}, \ ... \right)` instead of
+    as a product. The pretty printer was already correct.
+
 * stats
   * The `Kumaraswamy` distribution now has support `Interval(0, 1)` rather than
     `Interval(0, oo)`, matching its own documented density. Formerly every
