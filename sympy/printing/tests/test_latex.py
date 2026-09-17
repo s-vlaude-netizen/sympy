@@ -2828,6 +2828,9 @@ def test_Feedback_printing():
         r'\frac{\frac{p}{p + x}}{\frac{1}{1} + \left(\frac{p}{p + x}\right) \left(\frac{p - s}{p + s}\right)}'
     assert latex(Feedback(tf1*tf2, TransferFunction(1, 1, p))) == \
         r'\frac{\left(\frac{p}{p + x}\right) \left(\frac{p - s}{p + s}\right)}{\frac{1}{1} + \left(\frac{p}{p + x}\right) \left(\frac{p - s}{p + s}\right)}'
+    # a Series numerator with a plain transfer function in the feedback path
+    assert latex(Feedback(tf1*tf2, TransferFunction(p, p + 1, p))) == \
+        r'\frac{\left(\frac{p}{p + x}\right) \left(\frac{p - s}{p + s}\right)}{\frac{1}{1} + \left(\frac{p}{p + x}\right) \left(\frac{p - s}{p + s}\right) \left(\frac{p}{p + 1}\right)}'
     # Positive Feedback
     assert latex(Feedback(tf1, tf2, 1)) == \
         r'\frac{\frac{p}{p + x}}{\frac{1}{1} - \left(\frac{p}{p + x}\right) \left(\frac{p - s}{p + s}\right)}'
