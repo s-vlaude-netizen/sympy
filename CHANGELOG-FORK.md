@@ -11,7 +11,9 @@ API. See [`FORK.md`](FORK.md) for how they were produced and reviewed, and
 
 ## Unreleased
 
-Nothing yet. New entries go here, and move down when a tag is cut.
+What is on `master` now. Since this fork releases by `master` rather than by
+tag, this is the section to read: it is the running record, not a staging area,
+and entries stay here unless a tag is cut.
 
 ## fork-2026.9.17
 

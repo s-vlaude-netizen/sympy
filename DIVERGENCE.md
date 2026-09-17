@@ -6,10 +6,10 @@ and [FORK.md](FORK.md) for how they were produced.
 
 | | |
 |---|---|
-| Upstream `master` | `51fe8dc3` (2026-09-17) |
-| This fork | `e2fb6a61` (2026-09-17) |
+| Upstream `master` | `6e5b7af0` (2026-09-17) |
+| This fork | `aa1ba250` (2026-09-17) |
 | Upstream commits not yet merged here | 0 |
-| Fork commits on top of upstream | 29 |
+| Fork commits on top of upstream | 30 |
 
 ## Net difference in the source tree
 
@@ -17,10 +17,10 @@ What you get by using this fork instead of upstream, as a diff:
 
 ```
  CHANGELOG-FORK.md                                  | 156 +++++++++++++++++++++
- CLAUDE.md                                          | 130 ++++++++++++++++-
- DIVERGENCE.md                                      |  97 +++++++++++++
+ CLAUDE.md                                          | 135 +++++++++++++++++-
+ DIVERGENCE.md                                      |  99 +++++++++++++
  FORK.md                                            |  82 +++++++++++
- README.md                                          |  86 +++++++++---
+ README.md                                          | 101 ++++++++++---
  sympy/assumptions/handlers/matrices.py             |  12 +-
  sympy/assumptions/lra_satask.py                    |   4 +-
  sympy/assumptions/refine.py                        |   4 +-
@@ -53,7 +53,7 @@ What you get by using this fork instead of upstream, as a diff:
  sympy/stats/crv_types.py                           |   2 +-
  sympy/stats/tests/test_continuous_rv.py            |  11 ++
  tools/fork_divergence.py                           | 138 ++++++++++++++++++
- 37 files changed, 1197 insertions(+), 113 deletions(-)
+ 37 files changed, 1219 insertions(+), 113 deletions(-)
 ```
 
 ## Fork commits
@@ -87,6 +87,7 @@ What you get by using this fork instead of upstream, as a diff:
 - `761c1812` docs: record the pure-gain state space fix
 - `bd168134` docs: fold the changelog into one section and explain "Unreleased"
 - `e2fb6a61` Mark the fork in its version and document installing it
+- `58225666` docs: say how to update an installed fork, and what tags are not for
 
 ## Possibly adopted upstream since
 

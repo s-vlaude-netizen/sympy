@@ -126,12 +126,15 @@ copy as already current and leaves it alone. `--force-reinstall` skips that
 comparison; `--no-deps` just avoids reinstalling `mpmath` alongside. (Checked
 with pip 24.0.)
 
-To pin a fork release tag, which is what you want for anything reproducible:
+For anything reproducible, pin one of the
+[release tags](https://github.com/s-vlaude-netizen/sympy/tags):
 
     $ pip install "git+https://github.com/s-vlaude-netizen/sympy.git@fork-2026.9.17"
 
-A tag is not needed to get the newest code — `@master` is always that. Tags
-exist so a particular state can be named and returned to.
+Tags are cut rarely here, so the newest one can be well behind `master`. They
+exist so a state can be named and returned to, not as the way to get current
+code — `@master` is that. Pin a tag when you need the same code twice; use
+`@master` otherwise.
 
 To work on the fork, clone it and install in editable mode:
 
@@ -151,13 +154,19 @@ The fork marks itself in its version string with a PEP 440 local segment:
 
     >>> import sympy
     >>> sympy.__version__
-    '1.15.0.dev+fork.2026.9.17'
+    '1.15.0.dev+fork'
 
-Upstream has no `+fork...` part. The piece before it is the upstream version
-this fork is based on. To test for the fork in code:
+Upstream has no `+fork` part. The piece before it is the upstream version this
+fork is based on. An install from `master` reports plain `+fork`; one from a
+release tag carries the date too, as in `1.15.0.dev+fork.2026.9.17`. To test
+for the fork in code, which covers both:
 
     import sympy
-    is_fork = '+fork.' in sympy.__version__
+    is_fork = '+fork' in sympy.__version__
+
+Because the version does not change per commit, it identifies the fork but not
+which commit you are on. For that, `pip show sympy` or the `direct_url.json` in
+the installed distribution records the URL and revision pip used.
 
 Because that local segment sorts above the plain upstream version of the same
 number, pip will not silently replace the fork with upstream `1.15.0.dev`, but

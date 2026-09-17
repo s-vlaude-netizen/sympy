@@ -67,29 +67,39 @@ Do these without being asked, every session:
    drop the patch: a smaller fork is a better fork, and a fix upstream reaches
    on its own is a fix that was real.
 
-## Cutting a release
+## Releases and tags
 
-Tags are the fork's only release mechanism; it publishes no packages. To cut
-one, on `master` with a clean tree and upstream merged:
+**Do not ask the owner to cut, push, or publish a tag.** Tag pushes are blocked
+from the sandboxed session, so every tag becomes manual work for them, and they
+have asked for that not to land on their desk. `fork-2026.9.17` exists as the
+one worked example; treat it as the exception, not the first of a series.
 
-1. Set the date in `sympy/release.py`, keeping the shape
-   `<upstream base>+fork.<Y>.<M>.<D>`. Write the date the way PEP 440
-   normalises it, without leading zeros — `2026.9.17`, not `2026.09.17` — so
-   that the string in the file, the installed version and the tag all match.
-2. Rename `## Unreleased` in `CHANGELOG-FORK.md` to `## fork-<Y>.<M>.<D>`,
-   note the upstream base under it, and open a fresh empty `## Unreleased`
-   above.
-3. Update the pinned tag in the README's install commands.
-4. Commit, then `git tag -a fork-<Y>.<M>.<D>` with a message listing what is in
-   it, and `git push origin master --follow-tags`.
+The fork therefore releases by `master`, not by tag. `@master` is how anyone
+gets the current code, the changelog's `## Unreleased` section is the running
+record, and `sympy/release.py` stays at plain `1.15.0.dev+fork` with no date —
+a date set outside a release would go on claiming that release while master
+moved on. None of that needs a tag to work.
+
+Propose a tag only if the owner would plainly want one, for instance before a
+change that breaks compatibility so the previous state stays reachable, or
+because they asked. Then hand over the whole thing at once — the commands and
+an annotated message — rather than a series of steps, and say why this state is
+worth naming. If they decline, that is the end of it; nothing in the fork
+depends on tags existing.
+
+When a tag is genuinely wanted, on `master` with a clean tree and upstream
+merged: date the version in `sympy/release.py` as
+`<upstream base>+fork.<Y>.<M>.<D>`, written the way PEP 440 normalises it and
+so without leading zeros (`2026.9.17`, not `2026.09.17`), so the file, the
+installed version and the tag all read the same; rename `## Unreleased` in
+`CHANGELOG-FORK.md` to `## fork-<Y>.<M>.<D>`, note the upstream base under it
+and open a fresh empty `## Unreleased` above; update the pinned tag in the
+README; then commit, and hand the owner `git tag -a fork-<Y>.<M>.<D>` plus
+`git push origin master --follow-tags`. Set the version back to plain `+fork`
+in the next commit after the tagged one.
 
 Never move or delete a pushed tag: anyone who pinned it gets different code
 under the same name. Cut a new one instead.
-
-A tag is not how anyone gets the current code — `@master` is always that — so
-cut one when a state is worth naming, not on a schedule. Pushing tags is
-blocked from the sandboxed session; ask the owner to push the tag or create the
-release, and give them the message to use.
 
 ## Standards for a fix
 
