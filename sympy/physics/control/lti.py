@@ -1458,18 +1458,22 @@ class TransferFunctionBase(SISOLinearTimeInvariant, ABC):
         num_coeffs = num_poly.all_coeffs()
         den_coeffs = den_poly.all_coeffs()
 
+        # A transfer function with no poles is a pure gain: it has no dynamics,
+        # so its realisation has no states and the gain sits entirely in D.
+        # Giving it one state leaves that state neither reachable nor
+        # observable, and block diagonal connections carry it along, so a
+        # Series or Parallel involving a pure gain ends up a state larger than
+        # it should be.
         if n == 0:
             return (
-                Matrix([zeros(1)]),
-                Matrix([zeros(1)]),
-                Matrix([zeros(1)]),
+                zeros(0, 0),
+                zeros(0, 1),
+                zeros(1, 0),
                 Matrix([num_coeffs[0] / den_coeffs[0]]),
             )
 
         if self.num == self.den:
-            return (
-                Matrix([zeros(1)]), Matrix([zeros(1)]), Matrix([zeros(1)]), Matrix([1])
-            )
+            return (zeros(0, 0), zeros(0, 1), zeros(1, 0), Matrix([1]))
 
         diff = n - num_poly.degree()
         num_coeffs = [0]*diff + num_coeffs
