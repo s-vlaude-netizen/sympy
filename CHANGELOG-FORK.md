@@ -79,6 +79,17 @@ All of these are bug fixes: no API was added, removed, or renamed. See
     as does `refine(X.adjoint()*X, Q.unitary(X))`. The test was written against
     the elementwise conjugate, for which the identity does not hold.
 
+* physics.control
+  * A transfer function with a constant denominator is now realised with no
+    states rather than one dead state, fixing
+    [sympy/sympy#29179](https://github.com/sympy/sympy/issues/29179). Formerly
+    the unreachable, unobservable state a pure gain contributed was carried
+    into every series and parallel connection it took part in, so the sum of a
+    gain and a fourth-order transfer function came out with a 5×5 rather than
+    a 4×4 state matrix. Note that `TransferFunction(k, 1, s).rewrite(StateSpace)`
+    now has empty `A`, `B` and `C`; code asserting the old one-state form needs
+    updating.
+
 * printing
   * Fixed the LaTeX of a `Feedback` whose numerator is a `Series` and whose
     feedback path is an ordinary `TransferFunction`. A stray comma made the

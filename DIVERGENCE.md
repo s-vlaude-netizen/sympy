@@ -7,47 +7,52 @@ and [FORK.md](FORK.md) for how they were produced.
 | | |
 |---|---|
 | Upstream `master` | `51fe8dc3` (2026-09-17) |
-| This fork | `3f06adb3` (2026-09-17) |
+| This fork | `8c4b0af6` (2026-09-17) |
 | Upstream commits not yet merged here | 0 |
-| Fork commits on top of upstream | 24 |
+| Fork commits on top of upstream | 26 |
 
 ## Net difference in the source tree
 
 What you get by using this fork instead of upstream, as a diff:
 
 ```
- CHANGELOG-FORK.md                                  | 115 +++++++++++++++++++++
- FORK.md                                            |  82 +++++++++++++++
- README.md                                          |  18 +++-
- sympy/assumptions/handlers/matrices.py             |  12 +--
+ CHANGELOG-FORK.md                                  | 115 +++++++++++++++++
+ CLAUDE.md                                          |  94 +++++++++++++-
+ DIVERGENCE.md                                      |  88 +++++++++++++
+ FORK.md                                            |  82 ++++++++++++
+ README.md                                          |  18 ++-
+ sympy/assumptions/handlers/matrices.py             |  12 +-
  sympy/assumptions/lra_satask.py                    |   4 +-
  sympy/assumptions/refine.py                        |   4 +-
- sympy/assumptions/tests/test_refine.py             |  23 +++++
- sympy/assumptions/tests/test_rel_queries.py        |  20 ++++
- sympy/core/evalf.py                                |  35 ++++++-
- sympy/core/tests/test_evalf.py                     |  59 ++++++++++-
+ sympy/assumptions/tests/test_refine.py             |  23 ++++
+ sympy/assumptions/tests/test_rel_queries.py        |  20 +++
+ sympy/core/evalf.py                                |  35 +++++-
+ sympy/core/tests/test_evalf.py                     |  59 ++++++++-
  sympy/functions/elementary/exponential.py          |  15 ++-
  sympy/functions/elementary/integers.py             |   4 +-
- .../functions/elementary/tests/test_exponential.py |  12 +++
- sympy/functions/elementary/tests/test_integers.py  |  13 +++
- sympy/functions/special/bessel.py                  |  30 +++++-
+ .../functions/elementary/tests/test_exponential.py |  12 ++
+ sympy/functions/elementary/tests/test_integers.py  |  13 ++
+ sympy/functions/special/bessel.py                  |  30 ++++-
  sympy/functions/special/elliptic_integrals.py      |   8 ++
- sympy/functions/special/error_functions.py         |  48 ++++++---
- sympy/functions/special/gamma_functions.py         |  13 ++-
- sympy/functions/special/tests/test_bessel.py       |  49 +++++++++
+ sympy/functions/special/error_functions.py         |  48 +++++--
+ sympy/functions/special/gamma_functions.py         |  13 +-
+ sympy/functions/special/tests/test_bessel.py       |  49 ++++++++
  .../special/tests/test_elliptic_integrals.py       |  15 +++
- .../special/tests/test_error_functions.py          |  47 ++++++++-
+ .../special/tests/test_error_functions.py          |  47 ++++++-
  .../special/tests/test_gamma_functions.py          |  15 +++
  sympy/matrices/expressions/matmul.py               |   2 +-
- sympy/matrices/expressions/tests/test_matmul.py    |   6 ++
+ sympy/matrices/expressions/tests/test_matmul.py    |   6 +
+ sympy/physics/control/lti.py                       |  16 ++-
+ sympy/physics/control/tests/test_lti.py            |  12 +-
  sympy/printing/latex.py                            |   2 +-
  sympy/printing/tests/test_latex.py                 |   3 +
  sympy/solvers/ode/nonhomogeneous.py                |   8 +-
- sympy/solvers/ode/ode.py                           |  50 ++++++---
- sympy/solvers/ode/tests/test_ode.py                |  78 +++++++++++---
+ sympy/solvers/ode/ode.py                           |  50 +++++---
+ sympy/solvers/ode/tests/test_ode.py                |  78 +++++++++---
  sympy/stats/crv_types.py                           |   2 +-
  sympy/stats/tests/test_continuous_rv.py            |  11 ++
- 31 files changed, 722 insertions(+), 81 deletions(-)
+ tools/fork_divergence.py                           | 138 +++++++++++++++++++++
+ 36 files changed, 1058 insertions(+), 93 deletions(-)
 ```
 
 ## Fork commits
@@ -76,6 +81,8 @@ What you get by using this fork instead of upstream, as a diff:
 - `c64b0582` docs: identify this repository as an independent fork
 - `d333a056` printing: fix the LaTeX of a Feedback with a Series in its numerator
 - `b7364bdc` docs: record the LaTeX Feedback fix in the fork changelog
+- `a590baf4` tools: track divergence from upstream and record the fork's workflow
+- `8c4b0af6` physics.control: realise a pure gain with no states
 
 ## Possibly adopted upstream since
 
