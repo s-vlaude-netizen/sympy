@@ -7,18 +7,18 @@ and [FORK.md](FORK.md) for how they were produced.
 | | |
 |---|---|
 | Upstream `master` | `51fe8dc3` (2026-09-17) |
-| This fork | `8c4b0af6` (2026-09-17) |
+| This fork | `cdf6754b` (2026-09-17) |
 | Upstream commits not yet merged here | 0 |
-| Fork commits on top of upstream | 26 |
+| Fork commits on top of upstream | 27 |
 
 ## Net difference in the source tree
 
 What you get by using this fork instead of upstream, as a diff:
 
 ```
- CHANGELOG-FORK.md                                  | 115 +++++++++++++++++
+ CHANGELOG-FORK.md                                  | 126 +++++++++++++++++++
  CLAUDE.md                                          |  94 +++++++++++++-
- DIVERGENCE.md                                      |  88 +++++++++++++
+ DIVERGENCE.md                                      |  95 ++++++++++++++
  FORK.md                                            |  82 ++++++++++++
  README.md                                          |  18 ++-
  sympy/assumptions/handlers/matrices.py             |  12 +-
@@ -52,7 +52,7 @@ What you get by using this fork instead of upstream, as a diff:
  sympy/stats/crv_types.py                           |   2 +-
  sympy/stats/tests/test_continuous_rv.py            |  11 ++
  tools/fork_divergence.py                           | 138 +++++++++++++++++++++
- 36 files changed, 1058 insertions(+), 93 deletions(-)
+ 36 files changed, 1076 insertions(+), 93 deletions(-)
 ```
 
 ## Fork commits
@@ -83,6 +83,7 @@ What you get by using this fork instead of upstream, as a diff:
 - `b7364bdc` docs: record the LaTeX Feedback fix in the fork changelog
 - `a590baf4` tools: track divergence from upstream and record the fork's workflow
 - `8c4b0af6` physics.control: realise a pure gain with no states
+- `761c1812` docs: record the pure-gain state space fix
 
 ## Possibly adopted upstream since
 

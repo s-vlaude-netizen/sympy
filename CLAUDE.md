@@ -15,6 +15,16 @@ policy, so they live here instead. Two consequences shape all work here:
 
 Do these without being asked, every session:
 
+0. **Commit and push to `master` directly.** There is no feature-branch and
+   pull-request step here; the owner asked for the merge button to go away.
+   What replaces that review gate is the checklist under *Standards for a fix*
+   below, so treat it as binding rather than aspirational: on `master` a bad
+   push is the published state of the fork, with nothing in front of it.
+
+   Push a fix only once its suites are green. If work has to be left
+   half-finished, leave it uncommitted or stash it — never push a broken
+   `master` intending to follow up.
+
 1. **Merge upstream before starting new work.**
 
    ```
@@ -44,6 +54,13 @@ Do these without being asked, every session:
    naming the behaviour before and after. `DIVERGENCE.md` is the mechanical
    view; the changelog is the readable one, and it is what tells someone
    whether the fork is worth using.
+
+   Entries go under `## Unreleased`, grouped by subpackage, alphabetically.
+   "Unreleased" means no version has been tagged, not that the change is
+   unmerged — landing on `master` releases nothing. Entries move under a
+   version heading only when a tag is cut, and `## Unreleased` then stays,
+   empty, above it. Mark an entry that changes the shape of an existing
+   result, as opposed to correcting a wrong one, **Behaviour change**.
 
 4. **Watch for fixes upstream has adopted.** `DIVERGENCE.md` ends with a list
    of fork commits whose lines upstream now has independently. Verify each and

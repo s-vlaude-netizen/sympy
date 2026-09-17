@@ -1,29 +1,57 @@
 # Changelog for this fork
 
-Changes in this fork relative to upstream SymPy, newest group first. Every
+Changes in this fork relative to upstream SymPy, grouped by subpackage. Every
 entry names the behaviour before the change as well as after, so you can tell
 whether it affects you.
 
-All of these are bug fixes: no API was added, removed, or renamed. See
-[`FORK.md`](FORK.md) for how they were produced and reviewed.
+All of these are bug fixes. One changes the shape of an existing result and is
+marked **Behaviour change** below; nothing else adds, removes, or renames an
+API. See [`FORK.md`](FORK.md) for how they were produced and reviewed, and
+[`DIVERGENCE.md`](DIVERGENCE.md) for the corresponding diff against upstream.
 
 ## Unreleased
 
+Everything below is unreleased: this fork has never tagged a version. Entries
+move under a version heading when one is cut, not when they land on `master` —
+merging is not releasing.
+
 * assumptions
+  * `refine_sign` now forwards its assumptions to `ask`, so a refinement whose
+    realness follows from the assumptions rather than from the symbol is picked
+    up. Formerly `refine(sign(x), Q.positive(x))` gave `sign(x)` unchanged,
+    although `Q.positive(x)` implies `Q.real(x)`; it now gives `1`.
   * The LRA satisfiability solver now handles `Q.extended_nonnegative`, which
     was missing from its predicate white list. Formerly
     `ask(Q.ge(x + y, 0), Q.extended_nonnegative(x) & Q.extended_nonnegative(y))`
     gave `None` while the mirrored question about `Q.extended_nonpositive` gave
-    `True`.
+    `True`. Both give `True` now.
   * `Q.unitary` and `Q.orthogonal` now have a handler for `Adjoint`, so
     `ask(Q.unitary(X.adjoint()), Q.unitary(X))` gives `True` instead of `None`.
 
+* core
+  * `evalf` no longer lets an imaginary part that has cancelled down to
+    rounding noise decide which side of a branch cut a result falls on, in
+    either `evalf_pow` or `evalf_log`. The consequence was a wrong value, not
+    an imprecise one: for the roots of `5*x**4 + 3*x + 2` the imaginary part of
+    a root flipped sign between `evalf(30)` and `evalf(40)`, so two of the four
+    roots collapsed onto the same value at some precisions and substituting a
+    root back into the polynomial gave `4.64*I` instead of `0`. An imaginary
+    part with no correct bits is now treated as the exact zero it cannot be
+    distinguished from, giving the principal branch.
+
 * functions
-  * Fixed the leading term of `Ei` at zero, which ignored an explicitly
-    unspecified direction and so never applied its branch correction.
-    Formerly `limit(Ei(-exp(-x)) + x, x, oo)` gave `EulerGamma + I*pi` and the
-    mean of a Gumbel distribution, `integrate(x*exp(-x - exp(-x)), (x, -oo, oo))`,
-    came back complex; both now give `EulerGamma`.
+  * `exp._eval_refine` now forwards its assumptions to `ask`, so assumptions
+    passed explicitly to `refine` are no longer ignored in favour of the
+    symbol's own assumptions and the global context. Formerly, inside
+    `assuming(Q.odd(n))`, `refine(exp(pi*I*n), Q.even(n))` gave `-1`, the
+    global assumption silently winning over the explicit one; that
+    contradictory input now raises `ValueError`, as the other `refine` paths
+    already did, while `refine(exp(pi*I*n), Q.even(n))` on its own gives `1`.
+  * Fixed the leading term of `Ei` at zero, which ignored an unspecified
+    direction and so never applied its branch correction. Formerly
+    `limit(Ei(-exp(-x)) + x, x, oo)` gave `EulerGamma + I*pi`, and the mean of
+    a Gumbel distribution, `integrate(x*exp(-x - exp(-x)), (x, -oo, oo))`, came
+    back complex; both now give `EulerGamma`.
   * Fixed the leading term and series of `frac` at an integer approached from
     below. Formerly `frac(-x).as_leading_term(x)` gave `-x` and
     `frac(-x).nseries(x, n=2)` gave `-x`; they now give `1` and `1 - x`.
@@ -64,8 +92,9 @@ All of these are bug fixes: no API was added, removed, or renamed. See
   * Fixed the sign of the standalone term in `erfi(z).rewrite('expint')`, which
     was `2*I*sign(z)` away from `erfi` at every real point. Formerly
     `erfi(z).rewrite('expint').subs(z, 1).evalf()` gave
-    `1.65042575879754 + 2.0*I` instead of `1.65042575879754`. `erf` and `erfc`
-    were unaffected.
+    `1.65042575879754 + 2.0*I` instead of `1.65042575879754`. *Upstream has
+    since made the same fix independently, so the fork no longer diverges
+    here.*
   * `jn`, `yn`, `hn1` and `hn2` now evaluate numerically through their closed
     forms rather than through a Bessel function rewrite, which was negated on
     the negative real axis. Formerly `jn(0, -Rational(3, 7)).evalf()` gave
@@ -80,14 +109,14 @@ All of these are bug fixes: no API was added, removed, or renamed. See
     the elementwise conjugate, for which the identity does not hold.
 
 * physics.control
-  * A transfer function with a constant denominator is now realised with no
-    states rather than one dead state, fixing
+  * **Behaviour change.** A transfer function with a constant denominator is
+    now realised with no states rather than one dead state, fixing
     [sympy/sympy#29179](https://github.com/sympy/sympy/issues/29179). Formerly
     the unreachable, unobservable state a pure gain contributed was carried
     into every series and parallel connection it took part in, so the sum of a
     gain and a fourth-order transfer function came out with a 5×5 rather than
-    a 4×4 state matrix. Note that `TransferFunction(k, 1, s).rewrite(StateSpace)`
-    now has empty `A`, `B` and `C`; code asserting the old one-state form needs
+    a 4×4 state matrix. `TransferFunction(k, 1, s).rewrite(StateSpace)` now has
+    empty `A`, `B` and `C`, so code asserting the old one-state form needs
     updating.
 
 * printing
@@ -97,30 +126,27 @@ All of these are bug fixes: no API was added, removed, or renamed. See
     typeset that denominator as `\left( \frac{1}{1}, \ ... \right)` instead of
     as a product. The pretty printer was already correct.
 
+* solvers
+  * `ode_2nd_power_series_ordinary` now returns as many terms as asked for,
+    deriving the iteration count from the recurrence instead of using a
+    constant. Formerly `f'' + f` came back as
+    `C2*(x**4/24 - x**2/2 + 1) + C1*x*(1 - x**2/6) + O(x**6)`, missing the
+    `x**5/120` of the sine, so substituting the series back into the equation
+    left a residual of order `x**3` rather than `x**4`.
+  * `ode_2nd_power_series_ordinary` also solves the equations pinning down the
+    leading coefficients one at a time rather than summing them. They belong to
+    different powers of `x`, so adding them together lost some: for
+    `f'' + x**2*f`, where the recurrence steps by four, `a3` was left
+    undetermined and escaped into the answer as a bare `r(3)`.
+  * `_get_trial_set` no longer leaks trial terms between summands of an ODE's
+    right-hand side, having collected them into a mutable default argument that
+    persisted across calls. For `f'' - f = x*(x + 2) + exp(-x)` the leaked
+    terms produced `{1, x, x**2, x**3, x*exp(-x)}`, with a spurious `x**3`,
+    instead of `{1, x, x**2, x*exp(-x)}`.
+
 * stats
   * The `Kumaraswamy` distribution now has support `Interval(0, 1)` rather than
     `Interval(0, oo)`, matching its own documented density. Formerly every
     quantity computed by integrating the density picked up a divergent tail, so
     `E(Kumaraswamy('K', 2, 3))` and `variance(Kumaraswamy('K', 2, 3))` both gave
     `oo`. The mean is now `16/35`, and `b*beta(1 + 1/a, b)` in general.
-
-## Earlier
-
-* assumptions
-  * `refine_sign` now forwards its assumptions to `ask`, so
-    `refine(sign(x), Q.positive(x))` no longer ignores the assumption.
-
-* core
-  * `evalf` no longer lets rounding noise in an imaginary part choose a branch
-    in `evalf_pow` and `evalf_log`. An imaginary part with no accurate bits is
-    now discarded rather than used to pick a side of the cut.
-
-* functions
-  * `exp._eval_refine` now forwards its assumptions to `ask`.
-
-* solvers
-  * `ode_2nd_power_series_ordinary` now collects one equation per power of `x`
-    instead of summing them, derives its loop bound from the recurrence, and
-    returns the requested number of terms.
-  * `_get_trial_set` no longer leaks trial terms between summands of an ODE's
-    right-hand side, having carried a mutable default argument across calls.
