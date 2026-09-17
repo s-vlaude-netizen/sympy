@@ -86,6 +86,11 @@ one, on `master` with a clean tree and upstream merged:
 Never move or delete a pushed tag: anyone who pinned it gets different code
 under the same name. Cut a new one instead.
 
+A tag is not how anyone gets the current code — `@master` is always that — so
+cut one when a state is worth naming, not on a schedule. Pushing tags is
+blocked from the sandboxed session; ask the owner to push the tag or create the
+release, and give them the message to use.
+
 ## Standards for a fix
 
 Every fix needs all of these. They are the only thing standing in for the

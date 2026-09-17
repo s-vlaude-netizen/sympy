@@ -7,24 +7,24 @@ and [FORK.md](FORK.md) for how they were produced.
 | | |
 |---|---|
 | Upstream `master` | `51fe8dc3` (2026-09-17) |
-| This fork | `bd168134` (2026-09-17) |
+| This fork | `e2fb6a61` (2026-09-17) |
 | Upstream commits not yet merged here | 0 |
-| Fork commits on top of upstream | 28 |
+| Fork commits on top of upstream | 29 |
 
 ## Net difference in the source tree
 
 What you get by using this fork instead of upstream, as a diff:
 
 ```
- CHANGELOG-FORK.md                                  | 152 +++++++++++++++++++++
- CLAUDE.md                                          | 111 ++++++++++++++-
- DIVERGENCE.md                                      |  96 +++++++++++++
+ CHANGELOG-FORK.md                                  | 156 +++++++++++++++++++++
+ CLAUDE.md                                          | 130 ++++++++++++++++-
+ DIVERGENCE.md                                      |  97 +++++++++++++
  FORK.md                                            |  82 +++++++++++
- README.md                                          |  18 ++-
+ README.md                                          |  86 +++++++++---
  sympy/assumptions/handlers/matrices.py             |  12 +-
  sympy/assumptions/lra_satask.py                    |   4 +-
  sympy/assumptions/refine.py                        |   4 +-
- sympy/assumptions/tests/test_refine.py             |  23 ++++
+ sympy/assumptions/tests/test_refine.py             |  23 +++
  sympy/assumptions/tests/test_rel_queries.py        |  20 +++
  sympy/core/evalf.py                                |  35 ++++-
  sympy/core/tests/test_evalf.py                     |  59 +++++++-
@@ -46,13 +46,14 @@ What you get by using this fork instead of upstream, as a diff:
  sympy/physics/control/tests/test_lti.py            |  12 +-
  sympy/printing/latex.py                            |   2 +-
  sympy/printing/tests/test_latex.py                 |   3 +
+ sympy/release.py                                   |   5 +-
  sympy/solvers/ode/nonhomogeneous.py                |   8 +-
  sympy/solvers/ode/ode.py                           |  50 ++++---
  sympy/solvers/ode/tests/test_ode.py                |  78 ++++++++---
  sympy/stats/crv_types.py                           |   2 +-
  sympy/stats/tests/test_continuous_rv.py            |  11 ++
- tools/fork_divergence.py                           | 138 +++++++++++++++++++
- 36 files changed, 1120 insertions(+), 93 deletions(-)
+ tools/fork_divergence.py                           | 138 ++++++++++++++++++
+ 37 files changed, 1197 insertions(+), 113 deletions(-)
 ```
 
 ## Fork commits
@@ -85,6 +86,7 @@ What you get by using this fork instead of upstream, as a diff:
 - `8c4b0af6` physics.control: realise a pure gain with no states
 - `761c1812` docs: record the pure-gain state space fix
 - `bd168134` docs: fold the changelog into one section and explain "Unreleased"
+- `e2fb6a61` Mark the fork in its version and document installing it
 
 ## Possibly adopted upstream since
 

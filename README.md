@@ -114,9 +114,24 @@ To install the latest state of the fork:
 
     $ pip install "git+https://github.com/s-vlaude-netizen/sympy.git@master"
 
+To **update** to a newer `master` later, add `--force-reinstall`:
+
+    $ pip install --force-reinstall --no-deps \
+        "git+https://github.com/s-vlaude-netizen/sympy.git@master"
+
+Plain `pip install` and even `pip install --upgrade` will *not* pick up new
+commits here. The version string only changes when a release is tagged, and pip
+compares versions to decide whether to do anything, so it sees the installed
+copy as already current and leaves it alone. `--force-reinstall` skips that
+comparison; `--no-deps` just avoids reinstalling `mpmath` alongside. (Checked
+with pip 24.0.)
+
 To pin a fork release tag, which is what you want for anything reproducible:
 
     $ pip install "git+https://github.com/s-vlaude-netizen/sympy.git@fork-2026.9.17"
+
+A tag is not needed to get the newest code — `@master` is always that. Tags
+exist so a particular state can be named and returned to.
 
 To work on the fork, clone it and install in editable mode:
 
