@@ -59,6 +59,23 @@ def test_bessely_leading_term():
     assert bessely(1, sin(x)).as_leading_term(x) == -2/(pi*x)
     assert bessely(1, 2*sqrt(x)).as_leading_term(x) == -1/(pi*sqrt(x))
 
+    # For a non-integer order bessely carries no log term; the logarithmic
+    # expansion used for integers gets the dominant power wrong once the order
+    # is negative, and used to return something divergent where bessely -> 0.
+    # bessely(-1/2, z) is besselj(1/2, z) = sqrt(2/(pi*z))*sin(z) ~ sqrt(2*z/pi)
+    assert bessely(Rational(-1, 2), x).as_leading_term(x) == sqrt(2)*sqrt(x)/sqrt(pi)
+    assert bessely(Rational(1, 2), x).as_leading_term(x) == -sqrt(2)/(sqrt(pi)*sqrt(x))
+    assert bessely(Rational(-3, 2), x).as_leading_term(x) == \
+        -sqrt(2)*x**Rational(3, 2)/(3*sqrt(pi))
+    assert bessely(Rational(-5, 2), x).as_leading_term(x) == \
+        sqrt(2)*x**Rational(5, 2)/(15*sqrt(pi))
+    # the cdir given has to reach the log inside, which only shows up once
+    # the log picks up a branch correction
+    assert bessely(0, x**2).as_leading_term(x, cdir=1) == \
+        (4*log(x) - 2*log(2) + 2*S.EulerGamma)/pi
+    assert bessely(0, x**2).as_leading_term(x, cdir=-1) == \
+        (4*log(x) - 2*log(2) + 2*S.EulerGamma - 4*I*pi)/pi
+
 
 def test_besseli_leading_term():
     assert besseli(0, x).as_leading_term(x) == 1
@@ -73,6 +90,11 @@ def test_besselk_leading_term():
     assert besselk(S(5)/3, x).as_leading_term(x) == 2**(S(2)/3)*gamma(S(5)/3)/x**(S(5)/3)
     assert besselk(S(2)/3, x).as_leading_term(x) == besselk(-S(2)/3, x).as_leading_term(x)
     assert besselk(1,cos(x)).as_leading_term(x) == besselk(1,1)
+    # the cdir given has to reach the log of equation 9.6.8
+    assert besselk(0, x**2).as_leading_term(x, cdir=1) == \
+        -2*log(x) - S.EulerGamma + log(2)
+    assert besselk(0, x**2).as_leading_term(x, cdir=-1) == \
+        -2*log(x) - S.EulerGamma + log(2) + 2*I*pi
     assert besselk(3,1/x).as_leading_term(x) == sqrt(pi)*exp(-(1/x))/sqrt(2/x)
     assert besselk(3,1/sin(x)).as_leading_term(x) == sqrt(pi)*exp(-(1/x))/sqrt(2/x)
 
@@ -434,6 +456,33 @@ def test_yn():
 
     assert eq([yn(2, 5.2+0.3j).evalf(10)],
               [0.185250342 + 0.01489557397*I])
+
+
+def test_spherical_bessel_negative_argument():
+    # jn, yn, hn1 and hn2 used to be evaluated through
+    # sqrt(pi/(2*z))*besselj(nu + 1/2, z) and its relatives. Both factors
+    # carry a branch cut along the negative real axis and the product comes
+    # out negated there, so the numbers disagreed with the closed forms the
+    # very same classes expand to.
+    z = symbols("z")
+    pts = [Rational(-3, 7), S(-2), Rational(-5, 2)]
+    for nu in range(4):
+        for p in pts:
+            assert abs(jn(nu, p).evalf(25)
+                       - expand_func(jn(nu, z)).subs(z, p).evalf(25)) < 1e-20
+            assert abs(yn(nu, p).evalf(25)
+                       - expand_func(yn(nu, z)).subs(z, p).evalf(25)) < 1e-20
+            # j_nu(-x) = (-1)**nu * j_nu(x)
+            assert abs(jn(nu, p).evalf(25)
+                       - S.NegativeOne**nu*jn(nu, -p).evalf(25)) < 1e-20
+            # and the Hankel forms must stay jn +- I*yn
+            assert abs(hn1(nu, p).evalf(25)
+                       - (jn(nu, p) + I*yn(nu, p)).evalf(25)) < 1e-20
+            assert abs(hn2(nu, p).evalf(25)
+                       - (jn(nu, p) - I*yn(nu, p)).evalf(25)) < 1e-20
+    # positive and complex arguments are unchanged
+    assert eq([jn(2, 5.2 + 0.3j).evalf(10)], [0.09941975672 - 0.05452508024*I])
+    assert eq([yn(2, 5.2 + 0.3j).evalf(10)], [0.185250342 + 0.01489557397*I])
 
 
 def test_sympify_yn():

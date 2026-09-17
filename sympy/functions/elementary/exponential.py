@@ -1241,6 +1241,11 @@ class LambertW(DefinedFunction):
         if len(self.args) == 1:
             from sympy.functions.elementary.integers import ceiling
             from sympy.series.order import Order
+            # The sum below is the Taylor series of W about zero, so it only
+            # describes this branch where the argument goes to zero as well;
+            # anywhere else W is analytic and the generic expansion applies.
+            if not self.args[0].subs(x, 0).cancel().is_zero:
+                return super()._eval_nseries(x, n, logx, cdir=cdir)
             arg = self.args[0].nseries(x, n=n, logx=logx)
             lt = arg.as_leading_term(x, logx=logx)
             lte = 1

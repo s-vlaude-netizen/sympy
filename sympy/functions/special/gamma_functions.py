@@ -1017,10 +1017,19 @@ class loggamma(DefinedFunction):
         return self
 
     def _eval_nseries(self, x, n, logx=None, cdir=0):
-        x0 = self.args[0].limit(x, 0)
+        arg = self.args[0]
+        x0 = arg.limit(x, 0)
         if x0.is_zero:
             f = self._eval_rewrite_as_intractable(*self.args)
-            return f._eval_nseries(x, n, logx)
+            res = f._eval_nseries(x, n, logx)
+            # loggamma is the analytic continuation of log(gamma(z)); the two
+            # part company by 2*I*pi once z reaches zero from the negative
+            # side, where gamma is negative and log picks up an I*pi of its own
+            ndir = arg.as_leading_term(x, cdir=cdir).dir(
+                x, cdir if cdir != 0 else 1)
+            if re(ndir).is_negative:
+                res -= 2*I*pi
+            return res
         return super()._eval_nseries(x, n, logx)
 
     def _eval_aseries(self, n, args0, x, logx):

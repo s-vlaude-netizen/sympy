@@ -822,6 +822,17 @@ def test_kumaraswamy():
                                 (-(-x**a + 1)**b + 1, x <= 1),
                                 (1, True))
 
+    # the distribution lives on [0, 1]; a support of [0, oo) made every moment
+    # integral diverge
+    assert X.pspace.distribution.set == Interval(0, 1)
+    Y = Kumaraswamy("y", 2, 3)
+    assert simplify(Integral(density(Y)(x), (x, 0, 1)).doit()) == 1
+    assert E(Y) == Rational(16, 35)
+    assert simplify(variance(Y)) == Rational(201, 4900)
+    assert P(Y < S.Half) == Rational(37, 64)
+    # b*Beta(1 + 1/a, b) is the textbook mean
+    assert simplify(E(X) - b*beta(1 + 1/a, b)) == 0
+
 
 def test_laplace():
     mu = Symbol("mu")

@@ -663,7 +663,7 @@ class frac(DefinedFunction):
 
         if arg0.is_finite:
             if r.is_zero:
-                ndir = arg.dir(x, cdir=cdir)
+                ndir = arg.dir(x, cdir=cdir if cdir != 0 else 1)
                 if ndir.is_negative:
                     return S.One
                 return (arg - arg0).as_leading_term(x, logx=logx, cdir=cdir)
@@ -686,7 +686,7 @@ class frac(DefinedFunction):
         else:
             res = (arg - arg0)._eval_nseries(x, n, logx=logx, cdir=cdir)
             if r.is_zero:
-                ndir = arg.dir(x, cdir=cdir)
+                ndir = arg.dir(x, cdir=cdir if cdir != 0 else 1)
                 res += S.One if ndir.is_negative else S.Zero
             else:
                 res += r

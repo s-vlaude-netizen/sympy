@@ -637,6 +637,19 @@ def test_frac_leading_term():
     assert frac(sin(x**2) + 5).as_leading_term(x, cdir = 1) == x**2
     assert frac(sin(x**2) + 5).as_leading_term(x, cdir = -1) == x**2
 
+    # an unspecified cdir means the same as cdir=1; it used to leave the
+    # direction undetermined, so the argument was never seen to approach an
+    # integer from below and the +1 was dropped
+    assert frac(-x).as_leading_term(x) == frac(-x).as_leading_term(x, cdir=1) == S.One
+    assert frac(-2*x).as_leading_term(x) == S.One
+    assert frac(-x**2).as_leading_term(x) == S.One
+    assert frac(-2*x + 1).as_leading_term(x) == S.One
+    assert frac(sin(x) + 5).as_leading_term(x) == x
+    assert frac(-sin(x) + 5).as_leading_term(x) == S.One
+    # and the same for the series
+    assert frac(-x).nseries(x, n=2) == 1 - x
+    assert frac(x).nseries(x, n=2) == x
+
 
 @XFAIL
 def test_issue_4149():

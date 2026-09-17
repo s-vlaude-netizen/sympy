@@ -1250,12 +1250,16 @@ class Ei(DefinedFunction):
         from sympy import re
         x0 = self.args[0].limit(x, 0)
         arg = self.args[0].as_leading_term(x, cdir=cdir)
-        cdir = arg.dir(x, cdir)
+        # dir() returns coeff*cdir**minexp, so an unspecified cdir of 0 would
+        # collapse to 0 and hide which side of the branch cut we approach from
+        ndir = arg.dir(x, cdir if cdir != 0 else 1)
         if x0.is_zero:
-            c, e = arg.as_coeff_exponent(x)
-            logx = log(x) if logx is None else logx
-            return log(c) + e*logx + EulerGamma - (
-                I*pi if re(cdir).is_negative else S.Zero)
+            # Ei(z) ~ EulerGamma + log(z), with a further -I*pi when z reaches
+            # zero from the negative side. Let log() work out its own leading
+            # term: writing it by hand as log(c) + e*log(x) drops the branch
+            # correction that log carries for negative x.
+            return log(arg).as_leading_term(x, logx=logx, cdir=cdir) \
+                + EulerGamma - (I*pi if re(ndir).is_negative else S.Zero)
         return super()._eval_as_leading_term(x, logx=logx, cdir=cdir)
 
     def _eval_nseries(self, x, n, logx, cdir=0):
@@ -1664,8 +1668,22 @@ class li(DefinedFunction):
 
     def _eval_nseries(self, x, n, logx, cdir=0):
         z = self.args[0]
-        s = [(log(z))**k / (factorial(k) * k) for k in range(1, n)]
-        return EulerGamma + log(log(z)) + Add(*s)
+        # This is the expansion of Ei(w) about w = 0 with w = log(z), so it
+        # describes li only where log(z) tends to zero, that is around z = 1.
+        # Used around z = 0, where log(z) runs off to -oo, it returns a
+        # divergent expression for a function that tends to zero.
+        if z.limit(x, 0) is not S.One:
+            return self.rewrite(Ei)._eval_nseries(x, n, logx, cdir)
+        w = log(z)
+        s = [w**k / (factorial(k) * k) for k in range(1, n)]
+        res = EulerGamma + log(w) + Add(*s)
+        # Ei(w) is EulerGamma + log(w) only up to an I*pi that has to come off
+        # again once w reaches zero from the negative side, that is from below
+        # z = 1, where li is still real
+        ndir = w.as_leading_term(x, cdir=cdir).dir(x, cdir if cdir != 0 else 1)
+        if re(ndir).is_negative:
+            res -= I*pi
+        return res
 
     def _eval_is_zero(self):
         z = self.args[0]
@@ -2081,9 +2099,11 @@ class Ci(TrigonometricIntegral):
         if arg0 is S.NaN:
             arg0 = arg.limit(x, 0, dir='-' if re(cdir).is_negative else '+')
         if arg0.is_zero:
-            c, e = arg.as_coeff_exponent(x)
-            logx = log(x) if logx is None else logx
-            return log(c) + e*logx + EulerGamma
+            # the expansion at zero is EulerGamma + log(z); let log() supply
+            # its own leading term so the branch correction it carries for
+            # negative x survives, as it does not when this is spelled out by
+            # hand as log(c) + e*log(x)
+            return log(arg).as_leading_term(x, logx=logx, cdir=cdir) + EulerGamma
         elif arg0.is_finite:
             return self.func(arg0)
         else:
@@ -2317,9 +2337,11 @@ class Chi(TrigonometricIntegral):
         if arg0 is S.NaN:
             arg0 = arg.limit(x, 0, dir='-' if re(cdir).is_negative else '+')
         if arg0.is_zero:
-            c, e = arg.as_coeff_exponent(x)
-            logx = log(x) if logx is None else logx
-            return log(c) + e*logx + EulerGamma
+            # the expansion at zero is EulerGamma + log(z); let log() supply
+            # its own leading term so the branch correction it carries for
+            # negative x survives, as it does not when this is spelled out by
+            # hand as log(c) + e*log(x)
+            return log(arg).as_leading_term(x, logx=logx, cdir=cdir) + EulerGamma
         elif arg0.is_finite:
             return self.func(arg0)
         else:

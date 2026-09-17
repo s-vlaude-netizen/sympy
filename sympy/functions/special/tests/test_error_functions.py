@@ -251,6 +251,12 @@ def test_erfi():
     for zval in (Rational(3, 4), 2, -2, I, -2*I, 1 + I, -1 + I, -2 - I):
         r = erfi(z).rewrite(expint).subs(z, zval)
         assert abs(r.evalf(15) - erfi(zval).evalf(15)) < 1e-13
+    # the same agreement for every other rewrite target, either side of zero
+    for _p in (Rational(3, 7), Rational(-5, 2), S.One, -S.One, 2*I,
+               Rational(1, 3) + I/2):
+        for _t in ('uppergamma', 'erf', 'erfc', 'hyper', 'meijerg'):
+            assert abs(erfi(_p).evalf(30)
+                       - erfi(z).rewrite(_t).subs(z, _p).evalf(30)) < Rational(1, 10**20)
     assert erfi(z).rewrite('tractable') == -I*(-_erfs(I*z)*exp(z**2) + 1)
     assert expand_func(erfi(I*z)) == I*erf(z)
 
@@ -441,6 +447,28 @@ def test_ei():
 
     assert gruntz(Ei(x+exp(-x))*exp(-x)*x, x, oo) == 1
 
+    # Ei is real on the negative real axis, so a leading term taken with an
+    # unspecified cdir must not pick up the I*pi of log(-1); the direction used
+    # to collapse to 0 there, leaving the correction unapplied
+    w = Dummy('w', positive=True)
+    assert Ei(-w).as_leading_term(w) == log(w) + EulerGamma
+    assert Ei(w).as_leading_term(w) == log(w) + EulerGamma
+    assert limit(Ei(-exp(-x)) + x, x, oo) == EulerGamma
+    assert limit(Ei(exp(-x)) + x, x, oo) == EulerGamma
+    # the mean of a Gumbel distribution, which goes through that limit
+    assert integrate(x*exp(-x - exp(-x)), (x, -oo, oo)) == EulerGamma
+
+    # Ei(x**2) - log(x**2) is even in x, so both one sided limits agree; the
+    # expansion used to be assembled as log(c) + e*log(x), which drops the
+    # -2*I*pi that log(x**2) carries when x is negative
+    for f in (Ei, Ci, Chi):
+        assert limit(f(x**2) - log(x**2), x, 0, '+') == EulerGamma
+        assert limit(f(x**2) - log(x**2), x, 0, '-') == EulerGamma
+    assert Ei(x**2).as_leading_term(x, cdir=-1) == 2*log(x) - 2*I*pi + EulerGamma
+    assert Ei(x**2).as_leading_term(x, cdir=1) == 2*log(x) + EulerGamma
+    assert Ci(x**2).as_leading_term(x, cdir=-1) == 2*log(x) - 2*I*pi + EulerGamma
+    assert Ci(x**2).as_leading_term(x, cdir=1) == 2*log(x) + EulerGamma
+
     assert Ei(x).series(x) == EulerGamma + log(x) + x + x**2/4 + \
         x**3/18 + x**4/96 + x**5/600 + O(x**6)
     assert Ei(x).series(x, 1, 3) == Ei(1) + E*(x - 1) + O((x - 1)**3, (x, 1))
@@ -598,8 +626,19 @@ def test_li():
                                       meijerg(((), (1,)), ((0, 0), ()), -log(z)))
 
     assert gruntz(1/li(z), z, oo) is S.Zero
-    assert li(z).series(z) == log(z)**5/600 + log(z)**4/96 + log(z)**3/18 + log(z)**2/4 + \
-            log(z) + log(log(z)) + EulerGamma
+    # li(z) tends to zero as z does, like z/log(z); the expansion of Ei about
+    # zero used to be applied here even though log(z) runs off to -oo, giving
+    # a divergent -- and complex -- answer for a real function that vanishes
+    assert li(z).series(z) == z*(120/log(z)**5 + 24/log(z)**4 + 6/log(z)**3 +
+        2/log(z)**2 + 1/log(z) + 1 + O(log(z)**(-6)))/log(z)
+    assert limit(li(z), z, 0, '+') == 0
+    # around z = 1 the Ei expansion does apply, and stays real on both sides
+    assert li(1 + z).series(z, 0, 2) == \
+        log(z + 1) + log(log(z + 1)) + EulerGamma
+    # below z = 1 the log of the argument is negative and li is still real, so
+    # the I*pi that log carries there has to come off again
+    assert li(1 - z).series(z, 0, 2) == \
+        log(1 - z) + log(log(1 - z)) + EulerGamma - I*pi
     raises(ArgumentIndexError, lambda: li(z).fdiff(2))
 
 
@@ -613,8 +652,8 @@ def test_Li():
 
     assert gruntz(1/Li(z), z, oo) is S.Zero
     assert Li(z).rewrite(li) == li(z) - li(2)
-    assert Li(z).series(z) == \
-        log(z)**5/600 + log(z)**4/96 + log(z)**3/18 + log(z)**2/4 + log(z) + log(log(z)) - li(2) + EulerGamma
+    assert Li(z).series(z) == z*(120/log(z)**5 + 24/log(z)**4 + 6/log(z)**3 +
+        2/log(z)**2 + 1/log(z) + 1 + O(log(z)**(-6)))/log(z) - li(2)
     raises(ArgumentIndexError, lambda: Li(z).fdiff(2))
 
 

@@ -96,6 +96,26 @@ def test_all_pred():
     assert lra_satask(Q.positive_infinite(x)) is False
     assert lra_satask(Q.negative_infinite(x)) is False
 
+    # every extended_* predicate that has a plain counterpart below must be
+    # translated to it; Q.extended_nonnegative used to be left out of both the
+    # white list and the translation table, so it was rejected as unhandled
+    # while its four siblings went through
+    assert lra_satask(Q.ge(x, 0), Q.extended_nonnegative(x)) is True
+    assert lra_satask(Q.le(x, 0), Q.extended_nonpositive(x)) is True
+    assert lra_satask(Q.gt(x, 0), Q.extended_positive(x)) is True
+    assert lra_satask(Q.lt(x, 0), Q.extended_negative(x)) is True
+    assert lra_satask(Q.ne(x, 0), Q.extended_nonzero(x)) is True
+    # and it must not claim more than it knows
+    assert lra_satask(Q.gt(x, 0), Q.extended_nonnegative(x)) is None
+    assert lra_satask(Q.lt(x, 0), Q.extended_nonnegative(x)) is False
+    # combining several of them is what the LRA solver is for
+    assert ask(Q.ge(x + y, 0),
+        Q.extended_nonnegative(x) & Q.extended_nonnegative(y)) is True
+    assert ask(Q.ge(2*x + 3*y, 0),
+        Q.extended_nonnegative(x) & Q.extended_nonnegative(y)) is True
+    assert ask(Q.ge(x - y, 0),
+        Q.extended_nonnegative(x) & Q.extended_nonpositive(y)) is True
+
     # test disallowed pred
     raises(UnhandledInput, lambda: lra_satask((x > 0), (x > 2) & Q.prime(x)))
     raises(UnhandledInput, lambda: lra_satask((x > 0), (x > 2) & Q.composite(x)))
