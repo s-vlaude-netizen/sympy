@@ -67,6 +67,25 @@ Do these without being asked, every session:
    drop the patch: a smaller fork is a better fork, and a fix upstream reaches
    on its own is a fix that was real.
 
+## Cutting a release
+
+Tags are the fork's only release mechanism; it publishes no packages. To cut
+one, on `master` with a clean tree and upstream merged:
+
+1. Set the date in `sympy/release.py`, keeping the shape
+   `<upstream base>+fork.<Y>.<M>.<D>`. Write the date the way PEP 440
+   normalises it, without leading zeros — `2026.9.17`, not `2026.09.17` — so
+   that the string in the file, the installed version and the tag all match.
+2. Rename `## Unreleased` in `CHANGELOG-FORK.md` to `## fork-<Y>.<M>.<D>`,
+   note the upstream base under it, and open a fresh empty `## Unreleased`
+   above.
+3. Update the pinned tag in the README's install commands.
+4. Commit, then `git tag -a fork-<Y>.<M>.<D>` with a message listing what is in
+   it, and `git push origin master --follow-tags`.
+
+Never move or delete a pushed tag: anyone who pinned it gets different code
+under the same name. Cut a new one instead.
+
 ## Standards for a fix
 
 Every fix needs all of these. They are the only thing standing in for the

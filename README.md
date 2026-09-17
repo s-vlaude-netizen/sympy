@@ -47,18 +47,12 @@ community.
 
 ## Download
 
-The recommended installation method is through Anaconda,
-<https://www.anaconda.com/products/distribution>
+This fork is distributed only as source from this repository:
 
-You can also get the latest version of SymPy from
-<https://pypi.python.org/pypi/sympy/>
+    $ git clone https://github.com/s-vlaude-netizen/sympy.git
 
-To get the git version do
-
-    $ git clone https://github.com/sympy/sympy.git
-
-For other options (tarballs, debs, etc.), see
-<https://docs.sympy.org/dev/install.html>.
+See [Installation](#installation) below. The Anaconda and PyPI packages named
+`sympy` are upstream's and do not contain this fork's changes.
 
 ## Documentation and Usage
 
@@ -104,23 +98,59 @@ if SymPy is installed.
 
 ## Installation
 
-To install SymPy using PyPI, run the following command:
+**This fork is not on PyPI or conda.** `pip install sympy` and
+`conda install sympy` both give you upstream SymPy, without the fixes listed in
+[CHANGELOG-FORK.md](CHANGELOG-FORK.md). Install from this repository instead.
 
-    $ pip install sympy
+The fork installs under the name `sympy` and is imported as `sympy`, because it
+is SymPy with patches rather than a separate library. That means it replaces any
+SymPy already installed in the same environment, so **install it into a virtual
+environment** unless you intend to replace SymPy everywhere:
 
-To install SymPy using Anaconda, run the following command:
+    $ python -m venv .venv
+    $ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 
-    $ conda install -c anaconda sympy
+To install the latest state of the fork:
 
-To install SymPy from GitHub source, first clone SymPy using `git`:
+    $ pip install "git+https://github.com/s-vlaude-netizen/sympy.git@master"
 
-    $ git clone https://github.com/sympy/sympy.git
+To pin a fork release tag, which is what you want for anything reproducible:
 
-Then, in the `sympy` repository that you cloned, simply run:
+    $ pip install "git+https://github.com/s-vlaude-netizen/sympy.git@fork-2026.9.17"
 
-    $ pip install .
+To work on the fork, clone it and install in editable mode:
 
-See <https://docs.sympy.org/dev/install.html> for more information.
+    $ git clone https://github.com/s-vlaude-netizen/sympy.git
+    $ cd sympy
+    $ pip install -e .
+
+In a `requirements.txt`, the same pin looks like this — the `sympy @` prefix
+makes pip treat it as the `sympy` distribution, so it satisfies other packages'
+dependency on SymPy:
+
+    sympy @ git+https://github.com/s-vlaude-netizen/sympy.git@fork-2026.9.17
+
+### Checking which one you have
+
+The fork marks itself in its version string with a PEP 440 local segment:
+
+    >>> import sympy
+    >>> sympy.__version__
+    '1.15.0.dev+fork.2026.9.17'
+
+Upstream has no `+fork...` part. The piece before it is the upstream version
+this fork is based on. To test for the fork in code:
+
+    import sympy
+    is_fork = '+fork.' in sympy.__version__
+
+Because that local segment sorts above the plain upstream version of the same
+number, pip will not silently replace the fork with upstream `1.15.0.dev`, but
+it will treat a released upstream `1.15.0` as newer. Pin the tag if that
+matters.
+
+For SymPy's own installation notes, which otherwise apply,
+see <https://docs.sympy.org/dev/install.html>.
 
 ## Contributing
 

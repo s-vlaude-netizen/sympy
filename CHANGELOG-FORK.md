@@ -11,9 +11,13 @@ API. See [`FORK.md`](FORK.md) for how they were produced and reviewed, and
 
 ## Unreleased
 
-Everything below is unreleased: this fork has never tagged a version. Entries
-move under a version heading when one is cut, not when they land on `master` —
-merging is not releasing.
+Nothing yet. New entries go here, and move down when a tag is cut.
+
+## fork-2026.9.17
+
+Tracking upstream `1.15.0.dev`; installs as version
+`1.15.0.dev+fork.2026.9.17`. First tagged release of the fork, so this covers
+every change made since forking.
 
 * assumptions
   * `refine_sign` now forwards its assumptions to `ask`, so a refinement whose
