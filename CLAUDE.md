@@ -62,7 +62,17 @@ Do these without being asked, every session:
    empty, above it. Mark an entry that changes the shape of an existing
    result, as opposed to correcting a wrong one, **Behaviour change**.
 
-4. **Watch for fixes upstream has adopted.** `DIVERGENCE.md` ends with a list
+4. **Run the changelog checker after merging upstream.**
+
+   ```
+   python tools/check_changelog_claims.py
+   ```
+
+   It asserts every "now gives" claim in `CHANGELOG-FORK.md` against the live
+   code, so upstream drift cannot quietly leave the changelog promising
+   behaviour the fork no longer has. Add a claim to it with each new entry.
+
+5. **Watch for fixes upstream has adopted.** `DIVERGENCE.md` ends with a list
    of fork commits whose lines upstream now has independently. Verify each and
    drop the patch: a smaller fork is a better fork, and a fix upstream reaches
    on its own is a fix that was real.

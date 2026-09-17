@@ -7,18 +7,18 @@ and [FORK.md](FORK.md) for how they were produced.
 | | |
 |---|---|
 | Upstream `master` | `6e5b7af0` (2026-09-17) |
-| This fork | `58684c3d` (2026-09-17) |
+| This fork | `33d317ef` (2026-09-17) |
 | Upstream commits not yet merged here | 0 |
-| Fork commits on top of upstream | 31 |
+| Fork commits on top of upstream | 33 |
 
 ## Net difference in the source tree
 
 What you get by using this fork instead of upstream, as a diff:
 
 ```
- CHANGELOG-FORK.md                                  | 158 +++++++++++++++++++++
- CLAUDE.md                                          | 145 ++++++++++++++++++-
- DIVERGENCE.md                                      | 100 +++++++++++++
+ CHANGELOG-FORK.md                                  | 161 +++++++++++++++++++++
+ CLAUDE.md                                          | 150 ++++++++++++++++++-
+ DIVERGENCE.md                                      | 101 +++++++++++++
  FORK.md                                            |  82 +++++++++++
  README.md                                          | 110 +++++++++++---
  sympy/assumptions/handlers/matrices.py             |  12 +-
@@ -33,8 +33,8 @@ What you get by using this fork instead of upstream, as a diff:
  .../functions/elementary/tests/test_exponential.py |  12 ++
  sympy/functions/elementary/tests/test_integers.py  |  13 ++
  sympy/functions/special/bessel.py                  |  30 +++-
- sympy/functions/special/elliptic_integrals.py      |   8 ++
- sympy/functions/special/error_functions.py         |  48 +++++--
+ sympy/functions/special/elliptic_integrals.py      |   8 +
+ sympy/functions/special/error_functions.py         |  48 ++++--
  sympy/functions/special/gamma_functions.py         |  13 +-
  sympy/functions/special/tests/test_bessel.py       |  49 +++++++
  .../special/tests/test_elliptic_integrals.py       |  15 ++
@@ -42,18 +42,18 @@ What you get by using this fork instead of upstream, as a diff:
  .../special/tests/test_gamma_functions.py          |  15 ++
  sympy/matrices/expressions/matmul.py               |   2 +-
  sympy/matrices/expressions/tests/test_matmul.py    |   6 +
- sympy/physics/control/lti.py                       |  16 ++-
+ sympy/physics/control/lti.py                       |  16 +-
  sympy/physics/control/tests/test_lti.py            |  12 +-
  sympy/printing/latex.py                            |   2 +-
  sympy/printing/tests/test_latex.py                 |   3 +
  sympy/release.py                                   |   8 +-
  sympy/solvers/ode/nonhomogeneous.py                |   8 +-
- sympy/solvers/ode/ode.py                           |  50 ++++---
+ sympy/solvers/ode/ode.py                           |  50 +++++--
  sympy/solvers/ode/tests/test_ode.py                |  78 +++++++---
  sympy/stats/crv_types.py                           |   2 +-
  sympy/stats/tests/test_continuous_rv.py            |  11 ++
  tools/fork_divergence.py                           | 138 ++++++++++++++++++
- 37 files changed, 1244 insertions(+), 113 deletions(-)
+ 37 files changed, 1253 insertions(+), 113 deletions(-)
 ```
 
 ## Fork commits
@@ -89,6 +89,8 @@ What you get by using this fork instead of upstream, as a diff:
 - `e2fb6a61` Mark the fork in its version and document installing it
 - `58225666` docs: say how to update an installed fork, and what tags are not for
 - `58684c3d` docs: release by master, and stop the version claiming a stale tag
+- `2c89ace4` docs: note that the LRA entry needs real symbols
+- `33d317ef` docs: how to resolve the version line on an upstream bump
 
 ## Possibly adopted upstream since
 
